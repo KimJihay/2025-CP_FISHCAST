@@ -1,8 +1,11 @@
 import 'package:fishcast/core/utils/constants.dart';
 import 'package:fishcast/core/widgets/appbar.dart';
 import 'package:fishcast/core/widgets/cards/moon_phases_card.dart';
+import 'package:fishcast/core/widgets/graph/graph.dart';
+import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fishcast/core/widgets/cards/weather_card.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -12,6 +15,29 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  String dropdownValue = "Galunggong";
+  final List<String> fishTypes = [
+    'Galunggong',
+    'Tilapia',
+    'Bangus',
+    'Tuna',
+    'Maya-maya',
+    'Lapu-lapu',
+    'Hasa-hasa',
+    'Tanigue',
+    'Dalagang-bukid',
+    'Alumahan',
+  ];
+
+  void _onFishTypeChanged(String? newValue) {
+    if (newValue != null) {
+      setState(() {
+        dropdownValue = newValue;
+      });
+      // Here you can add code to update the chart based on the selected fish type
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,6 +132,79 @@ class _DashboardPageState extends State<DashboardPage> {
                     ],
                   ),
                 ),
+              ),
+              SizedBox(height: 27),
+              Text(
+                "Predicty Supply Volume",
+                style: TextStyle(
+                  color: kForegroundColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'Urbanist',
+                ),
+              ),
+              SizedBox(height: 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Next 7d",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 83.5,
+                    height: 22,
+                    child: Container(
+                      padding: const EdgeInsets.only(left: 8, right: 4),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        border: Border.all(
+                          color: kPrimaryStrokeColor,
+                          width: 1,
+                        ),
+                      ),
+                      child: DropdownButton<String>(
+                        isDense: true,
+                        isExpanded: true,
+                        value: dropdownValue,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: kSecondaryTextColor,
+                          size: 20,
+                        ),
+                        iconSize: 20,
+                        elevation: 2,
+                        style: const TextStyle(
+                          color: kSecondaryTextColor,
+                          fontSize: 12,
+                        ),
+                        dropdownColor: Colors.white,
+                        underline: const SizedBox(),
+                        onChanged: _onFishTypeChanged,
+                        items: fishTypes.map<DropdownMenuItem<String>>((
+                          String value,
+                        ) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 14),
+              SizedBox(
+                height: 220,
+                width: double.infinity,
+                child: LinechartWidget(pricePoints: pricePoints),
               ),
             ],
           ),
