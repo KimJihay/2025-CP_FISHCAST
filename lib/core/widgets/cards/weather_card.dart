@@ -11,8 +11,8 @@ class WeatherCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomCenter,
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
           colors: [Color(0xFF03457F), Color(0xFF009BDD)],
         ),
       ),
@@ -81,7 +81,7 @@ class WeatherCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Pasig City, Philippines",
+                    "Zamboanga City, Philippines",
                     style: TextStyle(
                       color: kBackgroundColor,
                       fontSize: 14,

@@ -28,7 +28,7 @@ class MoonPhasesCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Pasig City, Philippines",
+                    "Zamboanga City, Philippines",
                     style: TextStyle(
                       color: kBackgroundColor,
                       fontSize: 14,

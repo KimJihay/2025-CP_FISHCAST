@@ -1,5 +1,5 @@
 import 'package:fishcast/core/utils/constants.dart';
-import 'package:fishcast/core/widgets/appbar.dart';
+import 'package:fishcast/core/widgets/bar/appbar.dart';
 import 'package:fishcast/core/widgets/cards/moon_phases_card.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
@@ -34,7 +34,6 @@ class _DashboardPageState extends State<DashboardPage> {
       setState(() {
         dropdownValue = newValue;
       });
-      // Here you can add code to update the chart based on the selected fish type
     }
   }
 
