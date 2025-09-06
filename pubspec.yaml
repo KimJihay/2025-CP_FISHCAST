@@ -9,6 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.2.0
+  google_fonts: ^6.3.0
+  fl_chart: ^1.0.0
+  smooth_page_indicator: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +21,57 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Urbanist
+      fonts:
+        - asset: assets/fonts/Urbanist/static/Urbanist-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Urbanist/static/Urbanist-ThinItalic.ttf
+          weight: 100
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Urbanist/static/Urbanist-ExtraLightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Urbanist/static/Urbanist-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Urbanist/static/Urbanist-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Urbanist/static/Urbanist-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Urbanist/static/Urbanist-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Urbanist/static/Urbanist-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Urbanist/static/Urbanist-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+        - asset: assets/fonts/Urbanist/static/Urbanist-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Urbanist/static/Urbanist-BlackItalic.ttf
+          weight: 900
+          style: italic
+
+  assets:
+    - assets/
+    - assets/weather_card/
+    - assets/moon_phases_card/
+    - assets/fonts/
