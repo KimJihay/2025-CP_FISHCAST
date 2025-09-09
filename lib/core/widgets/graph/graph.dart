@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 class PricePoint {
   final double x;
   final double y;

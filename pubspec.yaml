@@ -71,7 +71,9 @@ flutter:
           style: italic
 
   assets:
-    - assets/
+    - assets/logo.svg
     - assets/weather_card/
     - assets/moon_phases_card/
     - assets/fonts/
+    - assets/login_button/
+    - assets/

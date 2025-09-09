@@ -1,6 +1,4 @@
-import 'package:fishcast/core/utils/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class WeatherForecastCard extends StatelessWidget {
   const WeatherForecastCard({super.key});
