@@ -17,7 +17,7 @@ class NotificationBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: false,
       elevation: 0,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      foregroundColor: Theme.of(context).colorScheme.onBackground,
+      foregroundColor: Theme.of(context).colorScheme.onSurface,
       actions: [
         TextButton.icon(
           onPressed: () {
