@@ -5,7 +5,6 @@ import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fishcast/core/widgets/cards/weather_card.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});

@@ -1,5 +1,6 @@
-import 'package:fishcast/features/dashboard.dart';
-import 'package:fishcast/features/notifications.dart';
+import 'package:fishcast/features/authentication/signup_page.dart';
+import 'package:fishcast/features/dashboard/dashboard.dart';
+import 'package:fishcast/features/notifications/notifications.dart';
 import 'package:fishcast/features/weather/weather.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainNavigation(),
+      home: SignupPage(),
     );
   }
 }
