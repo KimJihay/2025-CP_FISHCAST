@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "708225280852",
+    "project_id": "fishcast-5a188",
+    "storage_bucket": "fishcast-5a188.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708225280852:android:9f25e3f1d5641b0887b6c1",
+        "android_client_info": {
+          "package_name": "com.example.fishcast"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "708225280852-eka3ltemarkhb1ko21fer94mtgrlpc40.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fishcast",
+            "certificate_hash": "0c759cf7124c0198fbafdc85d3c01b3b8f717b64"
+          }
+        },
+        {
+          "client_id": "708225280852-i7sdibjkgf8ah4fgfb3hfqac7lpbpeo3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHi0EXrgYcawaG2eVyGEO8iPg4op0q1j8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "708225280852-i7sdibjkgf8ah4fgfb3hfqac7lpbpeo3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
