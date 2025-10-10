@@ -1,3 +1,4 @@
+import 'package:fishcast/features/help/help_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -22,7 +23,10 @@ class _AppbarWidgetState extends State<AppbarWidget> {
 
         IconButton(
           onPressed: () {
-            //TODO: Open Help Page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HelpPage()),
+            );
           },
           icon: SvgPicture.asset('assets/help_icon.svg', width: 32, height: 32),
         ),

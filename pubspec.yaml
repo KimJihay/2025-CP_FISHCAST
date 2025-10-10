@@ -13,6 +13,16 @@ dependencies:
   google_fonts: ^6.3.0
   fl_chart: ^1.0.0
   smooth_page_indicator: ^1.1.0
+  firebase_auth: ^6.0.2
+  firebase_core: ^4.1.0
+  cloud_firestore: ^6.0.1
+  google_sign_in: ^6.2.1
+  open_meteo: ^3.0.0
+  intl: ^0.19.0
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
+  shared_preferences: ^2.2.2
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

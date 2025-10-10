@@ -1,15 +1,491 @@
 import 'package:flutter/material.dart';
+import '../../core/utils/constants.dart';
+import '../../core/services/auth_service.dart';
+import '../../core/models/user_model.dart';
+import '../authentication/login_page.dart';
+import '../settings/settings_page.dart';
+import 'legal/privacy_policy_page.dart';
+import 'legal/terms_of_use_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
 
-class PoriflePage extends StatefulWidget {
-  const PoriflePage({super.key});
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
 
   @override
-  State<PoriflePage> createState() => _PoriflePageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _PoriflePageState extends State<PoriflePage> {
+class _ProfilePageState extends State<ProfilePage> {
+  final AuthService _authService = AuthService();
+  UserModel? _user;
+  bool _isLoading = true;
+  File? _localProfileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      UserModel? user = await _authService.getCurrentUserModel();
+      
+      // Load saved profile picture from local storage
+      if (user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final savedImagePath = prefs.getString('profile_image_${user.uid}');
+        
+        if (savedImagePath != null && File(savedImagePath).existsSync()) {
+          if (mounted) {
+            setState(() {
+              _localProfileImage = File(savedImagePath);
+            });
+          }
+        }
+      }
+      
+      if (mounted) {
+        setState(() {
+          _user = user;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showErrorSnackBar('Error loading user data: $e');
+      }
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  void _handleLogout() async {
+    // Show confirmation dialog
+    bool? confirmLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // If user confirmed logout
+    if (confirmLogout == true && mounted) {
+      try {
+        // Show loading indicator
+        setState(() {
+          _isLoading = true;
+        });
+
+        // Call the logout service
+        await _authService.signOut();
+
+        // Navigate to login page and clear the navigation stack
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+            (route) => false,
+          );
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Logged out successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        // Reset loading state
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          // Show error message
+          _showErrorSnackBar('Error logging out: $e');
+        }
+      }
+    }
+  }
+
+  void _handleAccountDeletion() async {
+    // Show confirmation dialog with warning
+    bool? confirmDeletion = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.warning_rounded, color: Colors.red, size: 28),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Delete Account',
+                style: TextStyle(
+                  color: kForegroundColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Are you sure you want to delete your account?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'This will permanently delete:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, size: 16, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Your profile information'),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, size: 16, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('All your app data'),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, size: 16, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Account settings'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This action cannot be undone!',
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              style: TextButton.styleFrom(
+                foregroundColor: kForegroundColor,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text(
+                'Delete Account',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    // If user confirmed deletion
+    if (confirmDeletion == true && mounted) {
+      try {
+        // Show loading indicator
+        setState(() {
+          _isLoading = true;
+        });
+
+        // Call the account deletion service
+        await _authService.deleteAccount();
+
+        // Navigate to login page and clear the navigation stack
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const LoginPage()),
+            (route) => false,
+          );
+
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account deleted successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        // Reset loading state
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          // Show error message
+          _showErrorSnackBar('Error deleting account: $e');
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return SafeArea(
+      child: Scaffold(
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: EdgeInsets.zero, // Remove padding from ListView
+                children: [
+                  _buildProfileHeader(),
+                  Padding(
+                    padding: const EdgeInsets.all(
+                      16.0,
+                    ), // Add padding only to the list items
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 24),
+                        _buildListTile(
+                          icon: Icons.edit,
+                          text: 'Edit Profile',
+                          onTap: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SettingsPage(),
+                              ),
+                            );
+                            // Reload user data if changes were saved
+                            if (result == true && mounted) {
+                              _loadUserData();
+                            }
+                          },
+                        ),
+                        _buildDivider(),
+                        _buildListTile(
+                          icon: Icons.privacy_tip,
+                          text: 'Privacy Policy',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const PrivacyPolicyPage(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildDivider(),
+                        _buildListTile(
+                          icon: Icons.description,
+                          text: 'Terms of Use',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const TermsOfUsePage(),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildDivider(),
+                        _buildListTile(
+                          icon: Icons.logout,
+                          text: 'Log Out',
+                          onTap: _handleLogout,
+                        ),
+                        _buildDivider(),
+                        _buildListTile(
+                          icon: Icons.delete_forever,
+                          text: 'Request Account Deletion',
+                          onTap: _handleAccountDeletion,
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildListTile({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: kForegroundColor, size: 24),
+      title: Text(
+        text,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
+      trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return const Divider(
+      height: 1,
+      thickness: 1,
+      indent: 16,
+      endIndent: 16,
+      color: Colors.grey,
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(color: Colors.blue),
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+      child: Column(
+        children: [
+          // Profile Picture
+          _buildProfilePicture(),
+          const SizedBox(height: 16),
+          Text(
+            _user?.fullName ?? 'Guest User',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _user?.email ?? 'guest@example.com',
+            style: const TextStyle(color: Colors.white70, fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfilePicture() {
+    // Show local image first if available
+    if (_localProfileImage != null) {
+      return CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.white,
+        backgroundImage: FileImage(_localProfileImage!),
+      );
+    }
+    
+    // Fall back to network image
+    if (_user?.profilePictureUrl != null &&
+        _user!.profilePictureUrl!.isNotEmpty) {
+      return CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.white,
+        backgroundImage: NetworkImage(_user!.profilePictureUrl!),
+        onBackgroundImageError: (exception, stackTrace) {
+          // Fallback to default avatar if image fails to load
+          setState(() {
+            // Could add error handling here
+          });
+        },
+        child: _user!.profilePictureUrl!.isEmpty
+            ? const Icon(Icons.person, size: 50, color: Colors.blue)
+            : null,
+      );
+    } else {
+      return const CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.white,
+        child: Icon(Icons.person, size: 50, color: Colors.blue),
+      );
+    }
   }
 }
