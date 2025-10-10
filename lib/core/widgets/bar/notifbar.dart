@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../utils/constants.dart';
 
 class NotificationBar extends StatelessWidget implements PreferredSizeWidget {
-  const NotificationBar({super.key});
+  final VoidCallback? onMarkAllAsRead;
+  final bool hasUnreadNotifications;
+  
+  const NotificationBar({
+    super.key,
+    this.onMarkAllAsRead,
+    this.hasUnreadNotifications = false,
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -19,16 +27,43 @@ class NotificationBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       foregroundColor: Theme.of(context).colorScheme.onSurface,
       actions: [
-        TextButton.icon(
-          onPressed: () {
-            // TODO: handle "mark all as read"
-          },
-          icon: const Icon(Icons.mark_email_read_outlined, size: 20),
-          label: const Text("Mark all as read"),
-          style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.primary,
+        if (hasUnreadNotifications)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Tooltip(
+              message: 'Mark all as read',
+              child: Material(
+                color: kSecondaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                child: InkWell(
+                  onTap: onMarkAllAsRead,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.done_all,
+                          size: 18,
+                          color: kSecondaryColor,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Mark all',
+                          style: TextStyle(
+                            color: kSecondaryColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:fishcast/core/utils/constants.dart';
 import 'package:fishcast/features/authentication/recover_email_page.dart';
 import 'package:fishcast/features/authentication/signup_page.dart';
 import 'package:fishcast/main.dart';
+import 'package:fishcast/core/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -14,6 +15,94 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
+  final AuthService _authService = AuthService();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleEmailLogin() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Please fill in all fields';
+        });
+      }
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+    }
+
+    try {
+      await _authService.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MainNavigation()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleGoogleLogin() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+    }
+
+    try {
+      await _authService.signInWithGoogle();
+
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MainNavigation()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +158,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 30),
               TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: "Username",
+                  hintText: "Email",
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 12,
@@ -80,6 +171,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 10),
               TextFormField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   hintText: "Password",
                   border: OutlineInputBorder(),
@@ -101,34 +194,42 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
                 ),
-                obscureText: _obscurePassword,
               ),
+              if (_errorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
               SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => const MainNavigation(),
-                    ),
-                    (route) => false,
-                  ),
+                  onPressed: _isLoading ? null : _handleEmailLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kSecondaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6.0),
                     ),
                   ),
-                  child: Text(
-                    "Log In",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Urbanist',
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          "Log In",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Urbanist',
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
               Align(
@@ -168,12 +269,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 30),
               OutlinedButton(
-                onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => const MainNavigation(),
-                  ),
-                  (route) => false,
-                ),
+                onPressed: _isLoading ? null : _handleGoogleLogin,
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.grey.shade300, width: 1.5),
                   shape: RoundedRectangleBorder(

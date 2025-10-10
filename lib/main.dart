@@ -1,10 +1,16 @@
-import 'package:fishcast/features/authentication/signup_page.dart';
+import 'package:fishcast/core/utils/constants.dart';
 import 'package:fishcast/features/dashboard/dashboard.dart';
+import 'package:fishcast/features/forecast/forecast.dart';
 import 'package:fishcast/features/notifications/notifications.dart';
+import 'package:fishcast/features/profile/profile.dart';
 import 'package:fishcast/features/weather/weather.dart';
+import 'package:fishcast/core/widgets/auth_wrapper.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MainApp());
 }
 
@@ -15,7 +21,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignupPage(),
+      home: AuthWrapper(),
     );
   }
 }
@@ -37,9 +43,9 @@ class _MainNavigationState extends State<MainNavigation> {
     _pages = <Widget>[
       const DashboardPage(),
       const WeatherPage(),
-      const Center(child: Text('Forecast')),
+      const ForecastPage(),
       const NotificationsPage(),
-      const Center(child: Text('Profile')),
+      const ProfilePage(),
     ];
   }
 
@@ -57,7 +63,7 @@ class _MainNavigationState extends State<MainNavigation> {
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Theme.of(context).primaryColor,
+        selectedItemColor: kSecondaryColor,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,

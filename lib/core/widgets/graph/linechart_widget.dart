@@ -15,7 +15,10 @@ class LinechartWidget extends StatelessWidget {
           drawVerticalLine: false,
           horizontalInterval: 20,
           getDrawingHorizontalLine: (value) {
-            return FlLine(color: Colors.grey.withOpacity(0.2), strokeWidth: 1);
+            return FlLine(
+              color: Colors.grey.withValues(alpha: 0.2),
+              strokeWidth: 1,
+            );
           },
         ),
         borderData: FlBorderData(show: false),
@@ -81,7 +84,7 @@ class LinechartWidget extends StatelessWidget {
             dotData: FlDotData(show: true),
             belowBarData: BarAreaData(
               show: true,
-              color: Colors.blue.withOpacity(0.1),
+              color: Colors.blue.withValues(alpha: 0.1),
             ),
           ),
         ],

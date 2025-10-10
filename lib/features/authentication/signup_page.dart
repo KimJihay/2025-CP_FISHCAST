@@ -1,5 +1,7 @@
 import 'package:fishcast/core/utils/constants.dart';
 import 'package:fishcast/features/authentication/login_page.dart';
+import 'package:fishcast/main.dart';
+import 'package:fishcast/core/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -13,6 +15,128 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  final AuthService _authService = AuthService();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleEmailSignup() async {
+    if (_firstNameController.text.isEmpty ||
+        _lastNameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Please fill in all fields';
+        });
+      }
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Passwords do not match';
+        });
+      }
+      return;
+    }
+
+    if (_passwordController.text.length < 6) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Password must be at least 6 characters';
+        });
+      }
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+    }
+
+    try {
+      await _authService.registerWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+      );
+      
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const MainNavigation(),
+          ),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleGoogleSignup() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+    }
+
+    try {
+      await _authService.signInWithGoogle();
+      
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const MainNavigation(),
+          ),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +191,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             SizedBox(height: 30),
             TextFormField(
+              controller: _firstNameController,
               decoration: InputDecoration(
                 hintText: "First Name",
                 border: OutlineInputBorder(),
@@ -78,6 +203,7 @@ class _SignupPageState extends State<SignupPage> {
             ),
             SizedBox(height: 10),
             TextFormField(
+              controller: _lastNameController,
               decoration: InputDecoration(
                 hintText: "Last Name",
                 border: OutlineInputBorder(),
@@ -89,6 +215,8 @@ class _SignupPageState extends State<SignupPage> {
             ),
             SizedBox(height: 10),
             TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 hintText: "Email",
                 border: OutlineInputBorder(),
@@ -97,21 +225,13 @@ class _SignupPageState extends State<SignupPage> {
                   vertical: 14,
                 ),
               ),
-              keyboardType: TextInputType.emailAddress,
             ),
             SizedBox(height: 10),
-            TextFormField(
-              decoration: InputDecoration(
-                hintText: "Username",
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 14,
-                ),
-              ),
-            ),
+            // Username field removed as it's not needed for Firebase auth
             SizedBox(height: 10),
             TextFormField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
               decoration: InputDecoration(
                 hintText: "Password",
                 border: OutlineInputBorder(),
@@ -131,10 +251,11 @@ class _SignupPageState extends State<SignupPage> {
                   },
                 ),
               ),
-              obscureText: _obscurePassword,
             ),
             SizedBox(height: 10),
             TextFormField(
+              controller: _confirmPasswordController,
+              obscureText: _obscureConfirmPassword,
               decoration: InputDecoration(
                 hintText: "Confirm Password",
                 border: OutlineInputBorder(),
@@ -156,32 +277,85 @@ class _SignupPageState extends State<SignupPage> {
                   },
                 ),
               ),
-              obscureText: _obscureConfirmPassword,
             ),
+            if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
             SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                ),
+                onPressed: _isLoading ? null : _handleEmailSignup,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kSecondaryColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6.0),
                   ),
                 ),
-                child: Text(
-                  "Sign Up",
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      )
+                    : const Text(
+                        "Sign Up",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Urbanist',
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
+            SizedBox(height: 30),
+            Row(
+              children: [
+                Expanded(child: Divider(thickness: 1)),
+                Text(
+                  "OR",
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
                     fontFamily: 'Urbanist',
-                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: kPrimaryStrokeColor,
                   ),
                 ),
+                Expanded(child: Divider(thickness: 1)),
+              ],
+            ),
+            SizedBox(height: 30),
+            OutlinedButton(
+              onPressed: _isLoading ? null : _handleGoogleSignup,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Colors.grey.shade300, width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset('assets/login_button/google.svg'),
+                  SizedBox(width: 10),
+                  Text(
+                    'Sign up with Google',
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: kSecondaryTextColor,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

@@ -3,6 +3,8 @@ import 'package:fishcast/core/widgets/bar/appbar.dart';
 import 'package:fishcast/core/widgets/cards/moon_phases_card.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
+import 'package:fishcast/core/services/location_service.dart';
+import 'package:fishcast/core/models/location_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fishcast/core/widgets/cards/weather_card.dart';
 
@@ -14,6 +16,10 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  final LocationService _locationService = LocationService();
+  LocationData? _sharedLocation;
+  bool _isLoadingLocation = true;
+  
   String dropdownValue = "Galunggong";
   final List<String> fishTypes = [
     'Galunggong',
@@ -28,6 +34,38 @@ class _DashboardPageState extends State<DashboardPage> {
     'Alumahan',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadLocation();
+  }
+
+  Future<void> _loadLocation() async {
+    try {
+      final location = await _locationService.getLocationWithCache()
+          .timeout(const Duration(seconds: 10));
+      
+      if (mounted) {
+        setState(() {
+          _sharedLocation = location;
+          _isLoadingLocation = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _sharedLocation = LocationData(
+            latitude: 6.9214,
+            longitude: 122.0790,
+            city: "Zamboanga City",
+            country: "Philippines",
+          );
+          _isLoadingLocation = false;
+        });
+      }
+    }
+  }
+
   void _onFishTypeChanged(String? newValue) {
     if (newValue != null) {
       setState(() {
@@ -40,14 +78,16 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const AppbarWidget()),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: ListView(
-            children: [
-              WeatherCard(),
-              SizedBox(height: 5),
-              MoonPhasesCard(),
+      body: _isLoadingLocation
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView(
+                  children: [
+                    WeatherCard(location: _sharedLocation!),
+                    const SizedBox(height: 5),
+                    MoonPhasesCard(location: _sharedLocation!),
               SizedBox(height: 20),
               Text(
                 "Highest Price Fish (per kg)",
@@ -133,7 +173,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               SizedBox(height: 27),
               Text(
-                "Predicty Supply Volume",
+                "Predict Supply Volume",
                 style: TextStyle(
                   color: kForegroundColor,
                   fontSize: 16,

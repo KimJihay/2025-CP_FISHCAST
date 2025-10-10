@@ -1,22 +1,71 @@
 import 'package:fishcast/core/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
+import '../../services/weather_service.dart';
+import '../../models/weather_model.dart';
+import '../../models/location_model.dart';
 
-class WeatherCard extends StatelessWidget {
-  const WeatherCard({super.key});
+class WeatherCard extends StatefulWidget {
+  final LocationData location;
+  
+  const WeatherCard({super.key, required this.location});
+
+  @override
+  State<WeatherCard> createState() => _WeatherCardState();
+}
+
+class _WeatherCardState extends State<WeatherCard> {
+  final WeatherService _weatherService = WeatherService();
+  CurrentWeather? _currentWeather;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWeather();
+  }
+
+  Future<void> _loadWeather() async {
+    try {
+      // Get current weather for provided location with timeout
+      final weather = await _weatherService.getCurrentWeather(
+        latitude: widget.location.latitude,
+        longitude: widget.location.longitude,
+      ).timeout(const Duration(seconds: 10));
+      
+      if (mounted) {
+        setState(() {
+          _currentWeather = weather;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  String _getFormattedDate() {
+    final now = DateTime.now();
+    return DateFormat('MMM dd, EEEE').format(now);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [Color(0xFF03457F), Color(0xFF009BDD)],
         ),
       ),
-      height: 169.34405517578125, // Exact height as requested
+      height: 169.34405517578125,
       width: MediaQuery.of(context).size.width,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -45,12 +94,11 @@ class WeatherCard extends StatelessWidget {
                               color: Colors.transparent,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFFFFEE9A,
-                                  ).withValues(alpha: 0.8),
+                                  color: const Color(0xFFFFEE9A)
+                                      .withValues(alpha: 0.8),
                                   spreadRadius: 0.8,
                                   blurRadius: 20,
-                                  offset: Offset(0, 0),
+                                  offset: const Offset(0, 0),
                                 ),
                               ],
                             ),
@@ -76,49 +124,60 @@ class WeatherCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Zamboanga City, Philippines",
-                    style: TextStyle(
-                      color: kBackgroundColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Urbanist',
+              const Spacer(),
+              _isLoading
+                  ? const Padding(
+                      padding: EdgeInsets.only(right: 40),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.location.displayName,
+                          style: const TextStyle(
+                            color: kBackgroundColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Urbanist',
+                          ),
+                        ),
+                        Text(
+                          _getFormattedDate(),
+                          style: const TextStyle(
+                            color: kBackgroundColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: 'Urbanist',
+                          ),
+                        ),
+                        Text(
+                          _currentWeather != null
+                              ? "${_currentWeather!.temperature.round()}°"
+                              : "25°",
+                          style: const TextStyle(
+                            color: kBackgroundColor,
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Urbanist',
+                          ),
+                        ),
+                        Text(
+                          _currentWeather != null
+                              ? "${_currentWeather!.fahrenheit.round()} Fahrenheit"
+                              : "77 Fahrenheit",
+                          style: const TextStyle(
+                            color: kBackgroundColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: 'Urbanist',
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    "Aug 15, Friday",
-                    style: TextStyle(
-                      color: kBackgroundColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Urbanist',
-                    ),
-                  ),
-                  Text(
-                    "25°",
-                    style: TextStyle(
-                      color: kBackgroundColor,
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Urbanist',
-                    ),
-                  ),
-                  Text(
-                    "77 Fahrenheit",
-                    style: TextStyle(
-                      color: kBackgroundColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Urbanist',
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(width: 19),
+              const SizedBox(width: 19),
             ],
           ),
         ],
