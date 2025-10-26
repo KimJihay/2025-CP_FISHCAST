@@ -49,41 +49,39 @@ class _MoonPhasesState extends State<MoonPhases> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final itemHeight = 60.0;
-        final headerHeight = 70.0;
-        final paddingHeight = 32.0;
-        // Calculate height for 7 moon phase items
-        final calculatedHeight =
-            (itemHeight * 7) + headerHeight + paddingHeight;
+        final screenWidth = MediaQuery.of(context).size.width;
+        final screenHeight = MediaQuery.of(context).size.height;
+        final titleFontSize = screenWidth < 360 ? 16.0 : 18.0;
+        final padding = screenWidth < 360 ? 12.0 : 16.0;
 
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomCenter,
               colors: [Color(0xFF000000), Color(0xFF41565F)],
             ),
           ),
           constraints: BoxConstraints(
-            minHeight: calculatedHeight.clamp(300, 500),
-            maxHeight: MediaQuery.of(context).size.height * 0.6,
+            minHeight: screenHeight * 0.3,
+            maxHeight: screenHeight * 0.65,
           ),
           width: double.infinity,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(padding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Moon Phases",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: padding * 0.75),
                 Expanded(child: _buildPhasesContent()),
               ],
             ),
@@ -101,15 +99,19 @@ class _MoonPhasesState extends State<MoonPhases> {
     }
 
     if (_error != null) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final iconSize = screenWidth < 360 ? 40.0 : 48.0;
+      final fontSize = screenWidth < 360 ? 13.0 : 14.0;
+      
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: Colors.white70, size: 48),
+            Icon(Icons.error_outline, color: Colors.white70, size: iconSize),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Failed to load moon phases',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontSize: fontSize),
             ),
             const SizedBox(height: 8),
             ElevatedButton(onPressed: _loadPhases, child: const Text('Retry')),
@@ -136,49 +138,71 @@ class _MoonPhasesState extends State<MoonPhases> {
                 phase.date.day == DateTime.now().day &&
                 phase.date.month == DateTime.now().month;
 
+            final screenWidth = MediaQuery.of(context).size.width;
+            final iconSize = screenWidth < 360 ? 36.0 : 40.0;
+            final fontSize = screenWidth < 360 ? 13.0 : 14.0;
+            final smallFontSize = screenWidth < 360 ? 11.0 : 12.0;
+            final emojiSize = screenWidth < 360 ? 18.0 : 20.0;
+            
             final widgets = <Widget>[
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Container(
-                  width: 40,
-                  height: 40,
+                  width: iconSize,
+                  height: iconSize,
                   decoration: BoxDecoration(
                     color: isToday
                         ? Colors.white.withValues(alpha: 0.2)
                         : Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(iconSize / 2),
                   ),
                   child: Center(
                     child: Text(
                       phase.emoji,
-                      style: const TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: emojiSize),
                     ),
                   ),
                 ),
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      phase.phaseName,
-                      style: TextStyle(
-                        color: isToday ? Colors.white : Colors.white,
-                        fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+                    Flexible(
+                      flex: 3,
+                      child: Text(
+                        phase.phaseName,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
+                          fontSize: fontSize,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Text(
-                      phase.formattedDate,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
+                    Flexible(
+                      flex: 2,
+                      child: Text(
+                        phase.formattedDate,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: smallFontSize,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
                       ),
                     ),
                   ],
                 ),
-                trailing: Text(
-                  phase.illuminationPercentage,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                trailing: SizedBox(
+                  width: screenWidth * 0.12,
+                  child: Text(
+                    phase.illuminationPercentage,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: fontSize,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
                   ),
                 ),
               ),

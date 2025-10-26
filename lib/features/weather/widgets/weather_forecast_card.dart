@@ -53,11 +53,10 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final itemHeight = 60.0;
-        final headerHeight = 70.0;
-        final paddingHeight = 32.0;
-        final calculatedHeight =
-            (itemHeight * 7) + headerHeight + paddingHeight;
+        final screenWidth = MediaQuery.of(context).size.width;
+        final screenHeight = MediaQuery.of(context).size.height;
+        final titleFontSize = screenWidth < 360 ? 16.0 : 18.0;
+        final padding = screenWidth < 360 ? 12.0 : 16.0;
 
         return Container(
           decoration: BoxDecoration(
@@ -69,24 +68,24 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
             ),
           ),
           constraints: BoxConstraints(
-            minHeight: calculatedHeight.clamp(300, 500),
-            maxHeight: MediaQuery.of(context).size.height * 0.6,
+            minHeight: screenHeight * 0.3,
+            maxHeight: screenHeight * 0.65,
           ),
           width: double.infinity,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(padding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Weather Forecast",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: padding * 0.75),
                 Expanded(child: _buildForecastContent()),
               ],
             ),
@@ -104,15 +103,19 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
     }
 
     if (_error != null) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final iconSize = screenWidth < 360 ? 40.0 : 48.0;
+      final fontSize = screenWidth < 360 ? 13.0 : 14.0;
+      
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: Colors.white70, size: 48),
+            Icon(Icons.error_outline, color: Colors.white70, size: iconSize),
             const SizedBox(height: 16),
             Text(
               'Failed to load forecast',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontSize: fontSize),
             ),
             const SizedBox(height: 8),
             ElevatedButton(
@@ -138,46 +141,69 @@ class _WeatherForecastCardState extends State<WeatherForecastCard> {
         children: [
           ...List.generate(_forecasts!.length, (index) {
             final forecast = _forecasts![index];
+            final screenWidth = MediaQuery.of(context).size.width;
+            final iconSize = screenWidth < 360 ? 36.0 : 40.0;
+            final fontSize = screenWidth < 360 ? 13.0 : 14.0;
+            final smallFontSize = screenWidth < 360 ? 11.0 : 12.0;
+            
             final widgets = <Widget>[
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Container(
-                  width: 40,
-                  height: 40,
+                  width: iconSize,
+                  height: iconSize,
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(iconSize / 2),
                   ),
                   child: Center(
                     child: Icon(
                       _getWeatherIcon(forecast.weatherCode),
                       color: Colors.white,
-                      size: 24,
+                      size: iconSize * 0.6,
                     ),
                   ),
                 ),
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      index == 0 ? 'Today' : forecast.dayOfWeek,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                    Flexible(
+                      flex: 2,
+                      child: Text(
+                        index == 0 ? 'Today' : forecast.dayOfWeek,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: fontSize,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Text(
-                      '${forecast.temperatureMax.round()}° / ${forecast.temperatureMin.round()}°',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    Flexible(
+                      flex: 2,
+                      child: Text(
+                        '${forecast.temperatureMax.round()}° / ${forecast.temperatureMin.round()}°',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: fontSize,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ],
                 ),
-                trailing: Text(
-                  forecast.condition,
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                trailing: SizedBox(
+                  width: screenWidth * 0.2,
+                  child: Text(
+                    forecast.condition,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: smallFontSize,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                  ),
                 ),
               ),
             ];

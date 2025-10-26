@@ -54,115 +54,138 @@ class _MoonPhasesCardState extends State<MoonPhasesCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF000000), Color(0xFF41565F)],
-        ),
-      ),
-      height: 169.34405517578125, // Exact height as requested
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                )
-              : Row(
-                  children: [
-                    const SizedBox(width: 19),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.location.displayName,
-                          style: const TextStyle(
-                            color: kBackgroundColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Urbanist',
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          _getFormattedDate(),
-                          style: const TextStyle(
-                            color: kBackgroundColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'Urbanist',
-                          ),
-                        ),
-                        const SizedBox(height: 35),
-                        Text(
-                          _currentPhase?.phaseName ?? "Loading...",
-                          style: const TextStyle(
-                            color: kBackgroundColor,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Urbanist',
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final cardHeight = screenWidth * 0.45; // Responsive height
+        final iconSize = screenWidth * 0.35; // Responsive icon area
+        final moonSize = screenWidth * 0.25; // Responsive moon size
+        final fontSize = screenWidth < 360 ? 10.0 : 12.0;
+        final phaseNameSize = screenWidth < 360 ? 20.0 : 24.0;
+        
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF000000), Color(0xFF41565F)],
+            ),
+          ),
+          height: cardHeight.clamp(140.0, 200.0),
+          width: double.infinity,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04,
+              vertical: 8,
+            ),
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
                     ),
-                    const Spacer(),
-                    SizedBox(
-                      width: 156,
-                      height: 135.34405517578125,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Positioned(
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                // Glow effect
-                                Container(
-                                  width: 112.66881561279297,
-                                  height: 106.09648895263672,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.transparent,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFFDCDCDC)
-                                            .withValues(alpha: 0.43),
-                                        spreadRadius: 0.8,
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 0),
-                                      ),
-                                    ],
+                  )
+                : Row(
+                    children: [
+                      // Moon phase info section
+                      Flexible(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.location.displayName,
+                                style: TextStyle(
+                                  color: kBackgroundColor,
+                                  fontSize: fontSize,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Urbanist',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            Flexible(
+                              child: Text(
+                                _getFormattedDate(),
+                                style: TextStyle(
+                                  color: kBackgroundColor,
+                                  fontSize: fontSize - 2,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'Urbanist',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            SizedBox(height: screenWidth * 0.05),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  _currentPhase?.phaseName ?? "Loading...",
+                                  style: TextStyle(
+                                    color: kBackgroundColor,
+                                    fontSize: phaseNameSize,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'Urbanist',
                                   ),
                                 ),
-                                // Moon emoji (fallback if SVG not available)
-                                if (_currentPhase != null)
-                                  Text(
-                                    _currentPhase!.emoji,
-                                    style: const TextStyle(fontSize: 100),
-                                  )
-                                else
-                                  SvgPicture.asset(
-                                    "assets/moon_phases_card/moon.svg",
-                                    width: 152,
-                                    height: 154.42,
-                                  ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-        ],
-      ),
+                      const SizedBox(width: 8),
+                      // Moon icon section
+                      Flexible(
+                        flex: 2,
+                        child: SizedBox(
+                          width: iconSize,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Glow effect
+                              Container(
+                                width: moonSize * 1.3,
+                                height: moonSize * 1.2,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.transparent,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFFDCDCDC)
+                                          .withValues(alpha: 0.43),
+                                      spreadRadius: 0.8,
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 0),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Moon emoji or SVG
+                              if (_currentPhase != null)
+                                Text(
+                                  _currentPhase!.emoji,
+                                  style: TextStyle(fontSize: moonSize * 0.9),
+                                )
+                              else
+                                SvgPicture.asset(
+                                  "assets/moon_phases_card/moon.svg",
+                                  width: moonSize,
+                                  height: moonSize,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 }

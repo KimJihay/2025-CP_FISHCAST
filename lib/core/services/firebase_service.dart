@@ -79,6 +79,9 @@ class FirebaseService {
   // Google Sign In
   Future<User?> signInWithGoogle() async {
     try {
+      // Sign out first to clear any cached credentials
+      await _googleSignIn.signOut();
+      
       // Trigger the Google Sign In flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       
@@ -86,8 +89,13 @@ class FirebaseService {
         return null; // User canceled the sign-in
       }
 
-      // Obtain authentication details
+      // Obtain authentication details with fresh token
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Verify we have valid tokens
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        throw Exception('Failed to obtain valid authentication tokens');
+      }
 
       // Create a new credential
       final AuthCredential credential = GoogleAuthProvider.credential(
@@ -117,8 +125,12 @@ class FirebaseService {
 
       return user;
     } on FirebaseAuthException catch (e) {
+      // Sign out on authentication failure to clear state
+      await _googleSignIn.signOut();
       throw _handleAuthException(e);
     } catch (e) {
+      // Sign out on any failure to clear state
+      await _googleSignIn.signOut();
       throw Exception('An unexpected error occurred: $e');
     }
   }
@@ -248,6 +260,69 @@ class FirebaseService {
     }
   }
 
+  // Re-authenticate with email and password
+  Future<void> reauthenticateWithEmailPassword(String password) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user == null || user.email == null) {
+        throw Exception('No user is currently signed in');
+      }
+
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw Exception('Re-authentication failed: $e');
+    }
+  }
+
+  // Re-authenticate with Google
+  Future<void> reauthenticateWithGoogle() async {
+    try {
+      // Sign out first to force account selection
+      await _googleSignIn.signOut();
+      
+      // Trigger the Google Sign In flow
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      
+      if (googleUser == null) {
+        throw Exception('Google sign-in was cancelled');
+      }
+
+      // Obtain authentication details
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        throw Exception('Failed to obtain valid authentication tokens');
+      }
+
+      // Create credential
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Re-authenticate
+      User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No user is currently signed in');
+      }
+
+      await user.reauthenticateWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      await _googleSignIn.signOut();
+      throw _handleAuthException(e);
+    } catch (e) {
+      await _googleSignIn.signOut();
+      throw Exception('Re-authentication failed: $e');
+    }
+  }
+
   // Delete user account
   Future<void> deleteAccount() async {
     try {
@@ -269,6 +344,21 @@ class FirebaseService {
     } catch (e) {
       throw Exception('Error deleting account: $e');
     }
+  }
+
+  // Get user's sign-in method
+  String? getUserSignInMethod() {
+    User? user = _auth.currentUser;
+    if (user == null) return null;
+
+    for (var userInfo in user.providerData) {
+      if (userInfo.providerId == 'google.com') {
+        return 'google';
+      } else if (userInfo.providerId == 'password') {
+        return 'password';
+      }
+    }
+    return null;
   }
 
   // Handle Firebase Auth exceptions
@@ -294,6 +384,10 @@ class FirebaseService {
         return 'Too many requests. Please try again later.';
       case 'account-exists-with-different-credential':
         return 'An account already exists with the same email but different sign-in credentials.';
+      case 'invalid-credential':
+        return 'Authentication failed. Please try signing in again.';
+      case 'requires-recent-login':
+        return 'REQUIRES_REAUTH'; // Special marker for re-authentication
       default:
         return 'An error occurred: ${e.message}';
     }

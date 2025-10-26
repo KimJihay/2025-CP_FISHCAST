@@ -131,6 +131,29 @@ class AuthService with ChangeNotifier {
     }
   }
 
+  // Re-authenticate with email and password
+  Future<void> reauthenticateWithEmailPassword(String password) async {
+    try {
+      await _firebaseService.reauthenticateWithEmailPassword(password);
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  // Re-authenticate with Google
+  Future<void> reauthenticateWithGoogle() async {
+    try {
+      await _firebaseService.reauthenticateWithGoogle();
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  // Get user's sign-in method
+  String? getUserSignInMethod() {
+    return _firebaseService.getUserSignInMethod();
+  }
+
   // Delete Account
   Future<void> deleteAccount() async {
     try {

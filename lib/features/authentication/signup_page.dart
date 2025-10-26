@@ -140,19 +140,30 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final logoSize = (screenWidth * 0.2).clamp(60.0, 90.0);
+    final titleFontSize = screenWidth < 360 ? 28.0 : 32.0;
+    final bodyFontSize = screenWidth < 360 ? 14.0 : 16.0;
+    final buttonHeight = screenHeight < 600 ? 45.0 : 50.0;
+    
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ListView(
           shrinkWrap: true,
           children: [
-            SvgPicture.asset('assets/logo.svg', height: 80.65, width: 81.05),
+            SvgPicture.asset(
+              'assets/logo.svg',
+              height: logoSize,
+              width: logoSize,
+            ),
             SizedBox(height: 20),
             Center(
               child: Text(
                 "Create Account",
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Urbanist',
                   color: kPrimaryColor,
@@ -167,7 +178,7 @@ class _SignupPageState extends State<SignupPage> {
                   "Already have an account?",
                   style: TextStyle(
                     fontFamily: 'Urbanist',
-                    fontSize: 16,
+                    fontSize: bodyFontSize,
                     fontWeight: FontWeight.w400,
                     color: Colors.black,
                   ),
@@ -183,7 +194,7 @@ class _SignupPageState extends State<SignupPage> {
                       fontFamily: 'Urbanist',
                       fontWeight: FontWeight.w400,
                       color: kPrimaryColor,
-                      fontSize: 16,
+                      fontSize: bodyFontSize,
                     ),
                   ),
                 ),
@@ -292,7 +303,7 @@ class _SignupPageState extends State<SignupPage> {
             SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: buttonHeight,
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _handleEmailSignup,
                 style: ElevatedButton.styleFrom(
@@ -305,10 +316,10 @@ class _SignupPageState extends State<SignupPage> {
                     ? const CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       )
-                    : const Text(
+                    : Text(
                         "Sign Up",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: bodyFontSize,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Urbanist',
                           color: Colors.white,

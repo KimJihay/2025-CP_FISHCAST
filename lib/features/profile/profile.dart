@@ -133,6 +133,90 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _showReauthenticationDialog() async {
+    String? signInMethod = _authService.getUserSignInMethod();
+    
+    if (signInMethod == 'google') {
+      // Google Sign-In re-authentication
+      try {
+        await _authService.reauthenticateWithGoogle();
+        return; // Success
+      } catch (e) {
+        throw Exception('Google re-authentication failed: $e');
+      }
+    } else if (signInMethod == 'password') {
+      // Email/Password re-authentication
+      final TextEditingController passwordController = TextEditingController();
+      bool? confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text(
+              'Verify Your Identity',
+              style: TextStyle(
+                color: kForegroundColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'For security reasons, please enter your password to continue.',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    prefixIcon: const Icon(Icons.lock_outline),
+                  ),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text('Verify'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmed == true && mounted) {
+        try {
+          await _authService.reauthenticateWithEmailPassword(passwordController.text);
+          return; // Success
+        } catch (e) {
+          throw Exception('Password verification failed: $e');
+        }
+      } else {
+        throw Exception('Re-authentication cancelled');
+      }
+    } else {
+      throw Exception('Unknown sign-in method');
+    }
+  }
+
   void _handleAccountDeletion() async {
     // Show confirmation dialog with warning
     bool? confirmDeletion = await showDialog<bool>(
@@ -301,14 +385,63 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         }
       } catch (e) {
-        // Reset loading state
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
+        // Check if re-authentication is required
+        if (e.toString().contains('REQUIRES_REAUTH')) {
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+          }
+          
+          try {
+            // Show re-authentication dialog
+            await _showReauthenticationDialog();
+            
+            // Retry deletion after successful re-authentication
+            if (mounted) {
+              setState(() {
+                _isLoading = true;
+              });
+            }
+            
+            await _authService.deleteAccount();
+            
+            // Navigate to login page and clear the navigation stack
+            if (mounted) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (route) => false,
+              );
 
-          // Show error message
-          _showErrorSnackBar('Error deleting account: $e');
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Account deleted successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          } catch (reauthError) {
+            // Reset loading state
+            if (mounted) {
+              setState(() {
+                _isLoading = false;
+              });
+
+              // Show error message
+              _showErrorSnackBar('Error: $reauthError');
+            }
+          }
+        } else {
+          // Reset loading state
+          if (mounted) {
+            setState(() {
+              _isLoading = false;
+            });
+
+            // Show error message
+            _showErrorSnackBar('Error deleting account: $e');
+          }
         }
       }
     }
@@ -400,13 +533,17 @@ class _ProfilePageState extends State<ProfilePage> {
     required String text,
     required VoidCallback onTap,
   }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = screenWidth < 360 ? 22.0 : 24.0;
+    final fontSize = screenWidth < 360 ? 14.0 : 16.0;
+    
     return ListTile(
-      leading: Icon(icon, color: kForegroundColor, size: 24),
+      leading: Icon(icon, color: kForegroundColor, size: iconSize),
       title: Text(
         text,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w500),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+      trailing: Icon(Icons.chevron_right, color: Colors.grey, size: iconSize - 2),
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 16.0,
@@ -426,6 +563,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileHeader() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final avatarRadius = (screenWidth * 0.13).clamp(45.0, 60.0);
+    final nameFontSize = screenWidth < 360 ? 20.0 : 24.0;
+    final emailFontSize = screenWidth < 360 ? 14.0 : 16.0;
+    
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(color: Colors.blue),
@@ -433,31 +575,37 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         children: [
           // Profile Picture
-          _buildProfilePicture(),
+          _buildProfilePicture(avatarRadius),
           const SizedBox(height: 16),
           Text(
             _user?.fullName ?? 'Guest User',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: nameFontSize,
               fontWeight: FontWeight.bold,
             ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
           const SizedBox(height: 8),
           Text(
             _user?.email ?? 'guest@example.com',
-            style: const TextStyle(color: Colors.white70, fontSize: 16),
+            style: TextStyle(color: Colors.white70, fontSize: emailFontSize),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProfilePicture() {
+  Widget _buildProfilePicture(double radius) {
+    final iconSize = radius * 1.0;
+    
     // Show local image first if available
     if (_localProfileImage != null) {
       return CircleAvatar(
-        radius: 50,
+        radius: radius,
         backgroundColor: Colors.white,
         backgroundImage: FileImage(_localProfileImage!),
       );
@@ -467,7 +615,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (_user?.profilePictureUrl != null &&
         _user!.profilePictureUrl!.isNotEmpty) {
       return CircleAvatar(
-        radius: 50,
+        radius: radius,
         backgroundColor: Colors.white,
         backgroundImage: NetworkImage(_user!.profilePictureUrl!),
         onBackgroundImageError: (exception, stackTrace) {
@@ -477,14 +625,14 @@ class _ProfilePageState extends State<ProfilePage> {
           });
         },
         child: _user!.profilePictureUrl!.isEmpty
-            ? const Icon(Icons.person, size: 50, color: Colors.blue)
+            ? Icon(Icons.person, size: iconSize, color: Colors.blue)
             : null,
       );
     } else {
-      return const CircleAvatar(
-        radius: 50,
+      return CircleAvatar(
+        radius: radius,
         backgroundColor: Colors.white,
-        child: Icon(Icons.person, size: 50, color: Colors.blue),
+        child: Icon(Icons.person, size: iconSize, color: Colors.blue),
       );
     }
   }

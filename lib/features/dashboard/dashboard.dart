@@ -76,6 +76,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final titleFontSize = screenWidth < 360 ? 14.0 : 16.0;
+    final chartHeight = (screenHeight * 0.25).clamp(180.0, 250.0);
+    
     return Scaffold(
       appBar: AppBar(title: const AppbarWidget()),
       body: _isLoadingLocation
@@ -93,7 +98,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 "Highest Price Fish (per kg)",
                 style: TextStyle(
                   color: kForegroundColor,
-                  fontSize: 16,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Urbanist',
                 ),
@@ -135,7 +140,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 "Lowest Price Fish (per kg)",
                 style: TextStyle(
                   color: kForegroundColor,
-                  fontSize: 16,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Urbanist',
                 ),
@@ -176,7 +181,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 "Predict Supply Volume",
                 style: TextStyle(
                   color: kForegroundColor,
-                  fontSize: 16,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Urbanist',
                 ),
@@ -190,10 +195,14 @@ class _DashboardPageState extends State<DashboardPage> {
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                   const SizedBox(width: 8),
-                  SizedBox(
-                    width: 83.5,
-                    height: 22,
+                  Flexible(
                     child: Container(
+                      constraints: BoxConstraints(
+                        minWidth: screenWidth * 0.2,
+                        maxWidth: screenWidth * 0.3,
+                        minHeight: 22,
+                        maxHeight: 28,
+                      ),
                       padding: const EdgeInsets.only(left: 8, right: 4),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
@@ -240,7 +249,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               SizedBox(height: 14),
               SizedBox(
-                height: 220,
+                height: chartHeight,
                 width: double.infinity,
                 child: LinechartWidget(pricePoints: pricePoints),
               ),
