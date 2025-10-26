@@ -106,6 +106,13 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final logoSize = (screenWidth * 0.2).clamp(60.0, 90.0);
+    final titleFontSize = screenWidth < 360 ? 28.0 : 32.0;
+    final bodyFontSize = screenWidth < 360 ? 14.0 : 16.0;
+    final buttonHeight = screenHeight < 600 ? 45.0 : 50.0;
+    
     return Scaffold(
       body: Center(
         child: Padding(
@@ -113,13 +120,17 @@ class _LoginPageState extends State<LoginPage> {
           child: ListView(
             shrinkWrap: true,
             children: [
-              SvgPicture.asset('assets/logo.svg', height: 80.65, width: 81.05),
+              SvgPicture.asset(
+                'assets/logo.svg',
+                height: logoSize,
+                width: logoSize,
+              ),
               SizedBox(height: 20),
               Center(
                 child: Text(
                   "Welcome Back!",
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'Urbanist',
                     color: kPrimaryColor,
@@ -134,7 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                     "No account yet?",
                     style: TextStyle(
                       fontFamily: 'Urbanist',
-                      fontSize: 16,
+                      fontSize: bodyFontSize,
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
                     ),
@@ -150,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                         fontFamily: 'Urbanist',
                         fontWeight: FontWeight.w400,
                         color: kPrimaryColor,
-                        fontSize: 16,
+                        fontSize: bodyFontSize,
                       ),
                     ),
                   ),
@@ -206,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
-                height: 50,
+                height: buttonHeight,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleEmailLogin,
                   style: ElevatedButton.styleFrom(
@@ -221,10 +232,10 @@ class _LoginPageState extends State<LoginPage> {
                             Colors.white,
                           ),
                         )
-                      : const Text(
+                      : Text(
                           "Log In",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: bodyFontSize,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Urbanist',
                             color: Colors.white,

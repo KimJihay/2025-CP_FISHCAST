@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "708225280852-8cctashvsh1u9mm52eeq2kcvsd7nkhl4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fishcast",
+            "certificate_hash": "8fe792b7ec8dd96c2d0c63890a02f5cb885bce9a"
+          }
+        },
+        {
           "client_id": "708225280852-eka3ltemarkhb1ko21fer94mtgrlpc40.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

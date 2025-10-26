@@ -56,132 +56,159 @@ class _WeatherCardState extends State<WeatherCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        gradient: const LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [Color(0xFF03457F), Color(0xFF009BDD)],
-        ),
-      ),
-      height: 169.34405517578125,
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 156,
-                height: 135.34405517578125,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Positioned(
-                      top: 14.68,
-                      left: 39.84,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Glow effect
-                          Container(
-                            width: 112.66881561279297,
-                            height: 106.09648895263672,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.transparent,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFFFFEE9A)
-                                      .withValues(alpha: 0.8),
-                                  spreadRadius: 0.8,
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 0),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Original SVG Sun
-                          SvgPicture.asset(
-                            "assets/weather_card/sun.svg",
-                            width: 87.64631652832031,
-                            height: 87.64631652832031,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: 58.48,
-                      left: 19,
-                      child: SvgPicture.asset(
-                        "assets/weather_card/clouds.svg",
-                        width: 122.86,
-                        height: 68.87,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              _isLoading
-                  ? const Padding(
-                      padding: EdgeInsets.only(right: 40),
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final cardHeight = screenWidth * 0.45; // Responsive height
+        final iconSize = screenWidth * 0.35; // Responsive icon area
+        final sunSize = screenWidth * 0.22; // Responsive sun size
+        final cloudSize = screenWidth * 0.3; // Responsive cloud size
+        final fontSize = screenWidth < 360 ? 12.0 : 14.0;
+        final tempFontSize = screenWidth < 360 ? 40.0 : 48.0;
+        
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: const LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xFF03457F), Color(0xFF009BDD)],
+            ),
+          ),
+          height: cardHeight.clamp(140.0, 200.0),
+          width: double.infinity,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04,
+              vertical: 8,
+            ),
+            child: Row(
+              children: [
+                // Weather icon section
+                Flexible(
+                  flex: 2,
+                  child: SizedBox(
+                    width: iconSize,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        Text(
-                          widget.location.displayName,
-                          style: const TextStyle(
-                            color: kBackgroundColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Urbanist',
+                        // Glow effect
+                        Container(
+                          width: sunSize * 1.3,
+                          height: sunSize * 1.2,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.transparent,
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFFEE9A)
+                                    .withValues(alpha: 0.8),
+                                spreadRadius: 0.8,
+                                blurRadius: 20,
+                                offset: const Offset(0, 0),
+                              ),
+                            ],
                           ),
                         ),
-                        Text(
-                          _getFormattedDate(),
-                          style: const TextStyle(
-                            color: kBackgroundColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'Urbanist',
-                          ),
+                        // Sun SVG
+                        SvgPicture.asset(
+                          "assets/weather_card/sun.svg",
+                          width: sunSize,
+                          height: sunSize,
                         ),
-                        Text(
-                          _currentWeather != null
-                              ? "${_currentWeather!.temperature.round()}°"
-                              : "25°",
-                          style: const TextStyle(
-                            color: kBackgroundColor,
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Urbanist',
-                          ),
-                        ),
-                        Text(
-                          _currentWeather != null
-                              ? "${_currentWeather!.fahrenheit.round()} Fahrenheit"
-                              : "77 Fahrenheit",
-                          style: const TextStyle(
-                            color: kBackgroundColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'Urbanist',
+                        // Clouds SVG
+                        Positioned(
+                          bottom: 0,
+                          child: SvgPicture.asset(
+                            "assets/weather_card/clouds.svg",
+                            width: cloudSize,
+                            height: cloudSize * 0.56,
                           ),
                         ),
                       ],
                     ),
-              const SizedBox(width: 19),
-            ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Weather info section
+                Flexible(
+                  flex: 3,
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                widget.location.displayName,
+                                style: TextStyle(
+                                  color: kBackgroundColor,
+                                  fontSize: fontSize,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Urbanist',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            Flexible(
+                              child: Text(
+                                _getFormattedDate(),
+                                style: TextStyle(
+                                  color: kBackgroundColor,
+                                  fontSize: fontSize - 2,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'Urbanist',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  _currentWeather != null
+                                      ? "${_currentWeather!.temperature.round()}°"
+                                      : "25°",
+                                  style: TextStyle(
+                                    color: kBackgroundColor,
+                                    fontSize: tempFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Urbanist',
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              child: Text(
+                                _currentWeather != null
+                                    ? "${_currentWeather!.fahrenheit.round()} Fahrenheit"
+                                    : "77 Fahrenheit",
+                                style: TextStyle(
+                                  color: kBackgroundColor,
+                                  fontSize: fontSize - 2,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'Urbanist',
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
