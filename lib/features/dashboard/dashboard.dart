@@ -249,7 +249,13 @@ class _DashboardPageState extends State<DashboardPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(fishName),
+                                  Expanded(
+                                    child: Text(
+                                      fishName,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
                                   Text("₱${price.toStringAsFixed(2)}")
                                 ],
                               ),
@@ -320,7 +326,13 @@ class _DashboardPageState extends State<DashboardPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(fishName),
+                                  Expanded(
+                                    child: Text(
+                                      fishName,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
                                   Text("₱${price.toStringAsFixed(2)}")
                                 ],
                               ),
