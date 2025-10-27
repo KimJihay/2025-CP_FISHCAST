@@ -2,6 +2,7 @@ import 'package:fishcast/core/utils/constants.dart';
 import 'package:fishcast/core/widgets/bar/appbar.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/dual_linechart_widget.dart';
+import 'package:fishcast/core/services/fish_type_service.dart';
 import 'package:flutter/material.dart';
 
 class ForecastPage extends StatefulWidget {
@@ -12,19 +13,46 @@ class ForecastPage extends StatefulWidget {
 }
 
 class _ForecastPageState extends State<ForecastPage> {
+  final FishTypeService _fishTypeService = FishTypeService();
+  
+  List<String> fishTypes = [];
+  bool _isLoadingFishTypes = true;
   String dropdownValue = "Galunggong";
-  final List<String> fishTypes = [
-    'Galunggong',
-    'Tilapia',
-    'Bangus',
-    'Tuna',
-    'Maya-maya',
-    'Lapu-lapu',
-    'Hasa-hasa',
-    'Tanigue',
-    'Dalagang-bukid',
-    'Alumahan',
-  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFishTypes();
+  }
+
+  /// Load fish types from API or use defaults
+  Future<void> _loadFishTypes() async {
+    try {
+      final types = await _fishTypeService.getFishTypeNames();
+      
+      if (mounted) {
+        setState(() {
+          fishTypes = types;
+          _isLoadingFishTypes = false;
+          // Ensure dropdownValue is valid
+          if (!fishTypes.contains(dropdownValue) && fishTypes.isNotEmpty) {
+            dropdownValue = fishTypes.first;
+          }
+        });
+      }
+    } catch (e) {
+      // Fallback to default fish types
+      if (mounted) {
+        setState(() {
+          fishTypes = _fishTypeService.getDefaultFishTypeNames();
+          _isLoadingFishTypes = false;
+          if (!fishTypes.contains(dropdownValue) && fishTypes.isNotEmpty) {
+            dropdownValue = fishTypes.first;
+          }
+        });
+      }
+    }
+  }
 
   void _onFishTypeChanged(String? newValue) {
     if (newValue != null) {
@@ -36,6 +64,13 @@ class _ForecastPageState extends State<ForecastPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingFishTypes) {
+      return Scaffold(
+        appBar: AppBar(title: const AppbarWidget()),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(title: const AppbarWidget()),
@@ -138,8 +173,8 @@ class _ForecastPageState extends State<ForecastPage> {
                   ),
                   width: double.infinity,
                   child: DualLinechartWidget(
-                    pricePoints: pricePoints,
-                    supplyPoints: supplyPoints,
+                    line1Data: pricePoints,
+                    line2Data: supplyPoints,
                   ),
                 ),
                 SizedBox(height: 15),

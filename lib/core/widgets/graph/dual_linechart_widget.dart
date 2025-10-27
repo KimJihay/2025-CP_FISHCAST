@@ -3,14 +3,40 @@ import 'package:flutter/material.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 
 class DualLinechartWidget extends StatelessWidget {
-  final List<PricePoint> pricePoints;
-  final List<PricePoint> supplyPoints;
+  /// First line data points
+  final List<ChartDataPoint> line1Data;
+  
+  /// Second line data points
+  final List<ChartDataPoint> line2Data;
+  
+  /// Configuration for the first line
+  final LineConfig line1Config;
+  
+  /// Configuration for the second line
+  final LineConfig line2Config;
+  
+  /// Configuration for the chart axes
+  final AxisConfig axisConfig;
 
   const DualLinechartWidget({
     super.key,
-    required this.pricePoints,
-    required this.supplyPoints,
+    required this.line1Data,
+    required this.line2Data,
+    this.line1Config = defaultPriceLineConfig,
+    this.line2Config = defaultSupplyLineConfig,
+    this.axisConfig = const AxisConfig(),
   });
+  
+  // Legacy constructor for backward compatibility
+  const DualLinechartWidget.legacy({
+    super.key,
+    required List<PricePoint> pricePoints,
+    required List<PricePoint> supplyPoints,
+  }) : line1Data = pricePoints,
+       line2Data = supplyPoints,
+       line1Config = defaultPriceLineConfig,
+       line2Config = defaultSupplyLineConfig,
+       axisConfig = const AxisConfig();
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +51,9 @@ class DualLinechartWidget extends StatelessWidget {
                 child: LineChart(
                   LineChartData(
                     gridData: FlGridData(
-                      show: true,
+                      show: axisConfig.showGrid,
                       drawVerticalLine: false,
-                      horizontalInterval: 20,
+                      horizontalInterval: axisConfig.interval ?? 20,
                       getDrawingHorizontalLine: (value) {
                         return FlLine(
                           color: Colors.grey.withValues(alpha: 0.2),
@@ -39,31 +65,18 @@ class DualLinechartWidget extends StatelessWidget {
                     titlesData: FlTitlesData(
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
-                          showTitles: true,
+                          showTitles: axisConfig.showBottomTitles,
                           reservedSize: constraints.maxWidth < 300
                               ? 20
                               : 30, // Responsive size
                           getTitlesWidget: (value, meta) {
-                            // Map x values to month names (0-11 for Jan-Dec)
-                            const months = [
-                              'Jan',
-                              'Feb',
-                              'Mar',
-                              'Apr',
-                              'May',
-                              'Jun',
-                              'Jul',
-                              'Aug',
-                              'Sep',
-                              'Oct',
-                              'Nov',
-                              'Dec',
-                            ];
-                            if (value >= 0 && value < months.length) {
+                            // Use custom labels if provided, otherwise use default months
+                            final labels = axisConfig.customLabels ?? defaultMonthLabels;
+                            if (value >= 0 && value < labels.length) {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Text(
-                                  months[value.toInt()],
+                                  labels[value.toInt()],
                                   style: const TextStyle(
                                     fontSize: 10,
                                     color: Colors.grey,
@@ -77,11 +90,11 @@ class DualLinechartWidget extends StatelessWidget {
                       ),
                       leftTitles: AxisTitles(
                         sideTitles: SideTitles(
-                          showTitles: true,
+                          showTitles: axisConfig.showLeftTitles,
                           reservedSize: constraints.maxWidth < 300
                               ? 30
                               : 40, // Responsive size
-                          interval: 20,
+                          interval: axisConfig.interval ?? 20,
                           getTitlesWidget: (value, meta) {
                             return Text(
                               '${value.toInt()}',
@@ -101,40 +114,41 @@ class DualLinechartWidget extends StatelessWidget {
                       ),
                     ),
                     lineBarsData: [
-                      // Price line (blue)
+                      // First line
                       LineChartBarData(
-                        spots: pricePoints
+                        spots: line1Data
                             .map((point) => FlSpot(point.x, point.y))
                             .toList(),
-                        isCurved: true,
-                        color: Colors.blue,
-                        barWidth: 2,
+                        isCurved: line1Config.isCurved,
+                        color: line1Config.color,
+                        barWidth: line1Config.lineWidth,
                         isStrokeCapRound: true,
-                        dotData: FlDotData(show: true),
+                        dotData: FlDotData(show: line1Config.showDots),
                         belowBarData: BarAreaData(
-                          show: true,
-                          color: Colors.blue.withValues(alpha: 0.1),
+                          show: line1Config.showArea,
+                          color: line1Config.color.withValues(alpha: line1Config.areaOpacity),
                         ),
                       ),
-                      // Supply line (green)
+                      // Second line
                       LineChartBarData(
-                        spots: supplyPoints
+                        spots: line2Data
                             .map((point) => FlSpot(point.x, point.y))
                             .toList(),
-                        isCurved: true,
-                        color: Colors.green,
-                        barWidth: 2,
+                        isCurved: line2Config.isCurved,
+                        color: line2Config.color,
+                        barWidth: line2Config.lineWidth,
                         isStrokeCapRound: true,
-                        dotData: FlDotData(show: true),
+                        dotData: FlDotData(show: line2Config.showDots),
                         belowBarData: BarAreaData(
-                          show: true,
-                          color: Colors.green.withValues(alpha: 0.1),
+                          show: line2Config.showArea,
+                          color: line2Config.color.withValues(alpha: line2Config.areaOpacity),
                         ),
                       ),
                     ],
-                    minX: 0,
-                    maxX: 11, // For 12 months (0-11)
-                    minY: 0,
+                    minX: axisConfig.minX ?? 0,
+                    maxX: axisConfig.maxX ?? 11, // For 12 months (0-11)
+                    minY: axisConfig.minY ?? 0,
+                    maxY: axisConfig.maxY,
                   ),
                 ),
               ),
@@ -153,15 +167,15 @@ class DualLinechartWidget extends StatelessWidget {
                         Container(
                           width: constraints.maxWidth < 300 ? 10 : 12,
                           height: 2,
-                          color: Colors.blue,
+                          color: line1Config.color,
                         ),
                         SizedBox(width: constraints.maxWidth < 300 ? 2 : 4),
                         FittedBox(
                           child: Text(
-                            'Price',
-                            style: const TextStyle(
+                            line1Config.label,
+                            style: TextStyle(
                               fontSize: 10,
-                              color: Colors.blue,
+                              color: line1Config.color,
                             ),
                             maxLines: 1,
                           ),
@@ -177,15 +191,15 @@ class DualLinechartWidget extends StatelessWidget {
                         Container(
                           width: constraints.maxWidth < 300 ? 10 : 12,
                           height: 2,
-                          color: Colors.green,
+                          color: line2Config.color,
                         ),
                         SizedBox(width: constraints.maxWidth < 300 ? 2 : 4),
                         FittedBox(
                           child: Text(
-                            'Supply',
-                            style: const TextStyle(
+                            line2Config.label,
+                            style: TextStyle(
                               fontSize: 10,
-                              color: Colors.green,
+                              color: line2Config.color,
                             ),
                             maxLines: 1,
                           ),

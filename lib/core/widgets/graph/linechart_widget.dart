@@ -3,8 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 
 class LinechartWidget extends StatelessWidget {
-  final List<PricePoint> pricePoints;
-  const LinechartWidget({super.key, required this.pricePoints});
+  /// Data points to display on the chart
+  final List<ChartDataPoint> data;
+  
+  /// Configuration for the line appearance
+  final LineConfig lineConfig;
+  
+  /// Configuration for the chart axes
+  final AxisConfig axisConfig;
+  
+  const LinechartWidget({
+    super.key,
+    required this.data,
+    this.lineConfig = defaultPriceLineConfig,
+    this.axisConfig = const AxisConfig(),
+  });
+  
+  // Legacy constructor for backward compatibility
+  const LinechartWidget.legacy({
+    super.key,
+    required List<PricePoint> pricePoints,
+  }) : data = pricePoints,
+       lineConfig = defaultPriceLineConfig,
+       axisConfig = const AxisConfig();
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +39,9 @@ class LinechartWidget extends StatelessWidget {
         return LineChart(
           LineChartData(
             gridData: FlGridData(
-              show: true,
+              show: axisConfig.showGrid,
               drawVerticalLine: false,
-              horizontalInterval: 20,
+              horizontalInterval: axisConfig.interval ?? 20,
               getDrawingHorizontalLine: (value) {
                 return FlLine(
                   color: Colors.grey.withValues(alpha: 0.2),
@@ -32,29 +53,16 @@ class LinechartWidget extends StatelessWidget {
             titlesData: FlTitlesData(
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
-                  showTitles: true,
+                  showTitles: axisConfig.showBottomTitles,
                   reservedSize: bottomReservedSize,
                   getTitlesWidget: (value, meta) {
-                    // Map x values to month names (0-11 for Jan-Dec)
-                    const months = [
-                      'Jan',
-                      'Feb',
-                      'Mar',
-                      'Apr',
-                      'May',
-                      'Jun',
-                      'Jul',
-                      'Aug',
-                      'Sep',
-                      'Oct',
-                      'Nov',
-                      'Dec',
-                    ];
-                    if (value >= 0 && value < months.length) {
+                    // Use custom labels if provided, otherwise use default months
+                    final labels = axisConfig.customLabels ?? defaultMonthLabels;
+                    if (value >= 0 && value < labels.length) {
                       return Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          months[value.toInt()],
+                          labels[value.toInt()],
                           style: TextStyle(
                             fontSize: fontSize,
                             color: Colors.grey,
@@ -68,9 +76,9 @@ class LinechartWidget extends StatelessWidget {
               ),
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
-                  showTitles: true,
+                  showTitles: axisConfig.showLeftTitles,
                   reservedSize: leftReservedSize,
-                  interval: 20,
+                  interval: axisConfig.interval ?? 20,
                   getTitlesWidget: (value, meta) {
                     return Text(
                       '${value.toInt()}',
@@ -86,23 +94,24 @@ class LinechartWidget extends StatelessWidget {
             ),
             lineBarsData: [
               LineChartBarData(
-                spots: pricePoints
+                spots: data
                     .map((point) => FlSpot(point.x, point.y))
                     .toList(),
-                isCurved: true,
-                color: Colors.blue,
-                barWidth: 2,
+                isCurved: lineConfig.isCurved,
+                color: lineConfig.color,
+                barWidth: lineConfig.lineWidth,
                 isStrokeCapRound: true,
-                dotData: FlDotData(show: true),
+                dotData: FlDotData(show: lineConfig.showDots),
                 belowBarData: BarAreaData(
-                  show: true,
-                  color: Colors.blue.withValues(alpha: 0.1),
+                  show: lineConfig.showArea,
+                  color: lineConfig.color.withValues(alpha: lineConfig.areaOpacity),
                 ),
               ),
             ],
-            minX: 0,
-            maxX: 11, // For 12 months (0-11)
-            minY: 0,
+            minX: axisConfig.minX ?? 0,
+            maxX: axisConfig.maxX ?? 11, // For 12 months (0-11)
+            minY: axisConfig.minY ?? 0,
+            maxY: axisConfig.maxY,
           ),
         );
       },
