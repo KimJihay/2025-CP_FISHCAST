@@ -5,6 +5,7 @@ import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
 import 'package:fishcast/core/services/location_service.dart';
 import 'package:fishcast/core/services/fish_type_service.dart';
+import 'package:fishcast/core/services/fish_forecast_service.dart';
 import 'package:fishcast/core/models/location_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fishcast/core/widgets/cards/weather_card.dart';
@@ -19,6 +20,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final LocationService _locationService = LocationService();
   final FishTypeService _fishTypeService = FishTypeService();
+  final FishForecastService _forecastService = FishForecastService();
   
   LocationData? _sharedLocation;
   bool _isLoadingLocation = true;
@@ -26,12 +28,94 @@ class _DashboardPageState extends State<DashboardPage> {
   List<String> fishTypes = [];
   bool _isLoadingFishTypes = true;
   String dropdownValue = "Galunggong";
+  
+  List<Map<String, dynamic>> _highestPriceFish = [];
+  List<Map<String, dynamic>> _lowestPriceFish = [];
+  bool _isLoadingPriceLists = true;
 
   @override
   void initState() {
     super.initState();
     _loadLocation();
     _loadFishTypes();
+    _loadPriceLists();
+  }
+
+  /// Load highest and lowest price fish from forecasts
+  Future<void> _loadPriceLists() async {
+    if (mounted) {
+      setState(() {
+        _isLoadingPriceLists = true;
+      });
+    }
+
+    try {
+      final allForecasts = await _forecastService.getAllForecasts();
+
+      if (allForecasts == null || allForecasts.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _highestPriceFish = [];
+            _lowestPriceFish = [];
+            _isLoadingPriceLists = false;
+          });
+        }
+        return;
+      }
+
+      // Build list of fish with their prices
+      final fishPriceList = <Map<String, dynamic>>[];
+
+      for (final entry in allForecasts.entries) {
+        final fishType = entry.key;
+        final forecast = entry.value;
+
+        if (forecast.forecast.isNotEmpty) {
+          final latestPrice = forecast.forecast.last.price;
+          final previousPrice = forecast.forecast.length > 1
+              ? forecast.forecast[forecast.forecast.length - 2].price
+              : latestPrice;
+
+          final changePercentage = previousPrice != 0
+              ? ((latestPrice - previousPrice) / previousPrice) * 100
+              : 0.0;
+
+          final displayName =
+              _forecastService.apiIdToDisplayName(fishType);
+
+          fishPriceList.add({
+            'fishName': displayName,
+            'price': latestPrice,
+            'changePercentage': changePercentage,
+            'fishType': fishType,
+          });
+        }
+      }
+
+      // Sort for highest price (descending)
+      final highest = List<Map<String, dynamic>>.from(fishPriceList)
+        ..sort((a, b) => (b['price'] as num).compareTo(a['price'] as num));
+
+      // Sort for lowest price (ascending)
+      final lowest = List<Map<String, dynamic>>.from(fishPriceList)
+        ..sort((a, b) => (a['price'] as num).compareTo(b['price'] as num));
+
+      if (mounted) {
+        setState(() {
+          _highestPriceFish = highest.take(5).toList();
+          _lowestPriceFish = lowest.take(5).toList();
+          _isLoadingPriceLists = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _highestPriceFish = [];
+          _lowestPriceFish = [];
+          _isLoadingPriceLists = false;
+        });
+      }
+    }
   }
 
   /// Load fish types from API or use defaults
@@ -139,22 +223,51 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      ...List.generate(5, (index) {
-                        final widgets = <Widget>[
-                          ListTile(
-                            leading: Text("${index + 1}"),
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [Text("Tilapia"), Text("₱100")],
-                            ),
-                            trailing: Text("+3%"),
+                      if (_isLoadingPriceLists)
+                        Center(
+                          child: CircularProgressIndicator(color: kSecondaryColor),
+                        )
+                      else if (_highestPriceFish.isEmpty)
+                        Center(
+                          child: Text(
+                            'No price data available',
+                            style: TextStyle(color: kSecondaryTextColor),
                           ),
-                        ];
-                        if (index < 4) {
-                          widgets.add(const Divider());
-                        }
-                        return widgets;
-                      }).expand((x) => x),
+                        )
+                      else
+                        ...List.generate(_highestPriceFish.length, (index) {
+                          final fishData = _highestPriceFish[index];
+                          final changePercentage =
+                              fishData['changePercentage'] as double;
+                          final price = fishData['price'] as double;
+                          final fishName = fishData['fishName'] as String;
+
+                          final widgets = <Widget>[
+                            ListTile(
+                              leading: Text("${index + 1}"),
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(fishName),
+                                  Text("₱${price.toStringAsFixed(2)}")
+                                ],
+                              ),
+                              trailing: Text(
+                                "${changePercentage > 0 ? '+' : ''}${changePercentage.toStringAsFixed(1)}%",
+                                style: TextStyle(
+                                  color: changePercentage > 0
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                              ),
+                            ),
+                          ];
+                          if (index < _highestPriceFish.length - 1) {
+                            widgets.add(const Divider());
+                          }
+                          return widgets;
+                        }).expand((x) => x),
                       SizedBox(height: 27),
                       Align(
                         alignment: Alignment.centerRight,
@@ -181,22 +294,51 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      ...List.generate(5, (index) {
-                        final widgets = <Widget>[
-                          ListTile(
-                            leading: Text("${index + 1}"),
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [Text("Tilapia"), Text("₱100")],
-                            ),
-                            trailing: Text("+3%"),
+                      if (_isLoadingPriceLists)
+                        Center(
+                          child: CircularProgressIndicator(color: kSecondaryColor),
+                        )
+                      else if (_lowestPriceFish.isEmpty)
+                        Center(
+                          child: Text(
+                            'No price data available',
+                            style: TextStyle(color: kSecondaryTextColor),
                           ),
-                        ];
-                        if (index < 4) {
-                          widgets.add(const Divider());
-                        }
-                        return widgets;
-                      }).expand((x) => x),
+                        )
+                      else
+                        ...List.generate(_lowestPriceFish.length, (index) {
+                          final fishData = _lowestPriceFish[index];
+                          final changePercentage =
+                              fishData['changePercentage'] as double;
+                          final price = fishData['price'] as double;
+                          final fishName = fishData['fishName'] as String;
+
+                          final widgets = <Widget>[
+                            ListTile(
+                              leading: Text("${index + 1}"),
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(fishName),
+                                  Text("₱${price.toStringAsFixed(2)}")
+                                ],
+                              ),
+                              trailing: Text(
+                                "${changePercentage > 0 ? '+' : ''}${changePercentage.toStringAsFixed(1)}%",
+                                style: TextStyle(
+                                  color: changePercentage > 0
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                              ),
+                            ),
+                          ];
+                          if (index < _lowestPriceFish.length - 1) {
+                            widgets.add(const Divider());
+                          }
+                          return widgets;
+                        }).expand((x) => x),
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
