@@ -274,7 +274,7 @@ class _ForecastPageState extends State<ForecastPage> {
       data: pricePoints,
       lineConfig: const LineConfig(
         color: Colors.blue,
-        label: 'Price (₱)',
+        label: 'Price',
         lineWidth: 3.0,
         showDots: true,
         showArea: true,
@@ -286,6 +286,7 @@ class _ForecastPageState extends State<ForecastPage> {
         minY: yMin,
         maxY: yMax,
         interval: priceRange > 100 ? 50 : 20,
+        yAxisLabel: 'Price (₱)',
       ),
     );
   }

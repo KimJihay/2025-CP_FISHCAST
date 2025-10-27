@@ -45,6 +45,7 @@ class AxisConfig {
   final bool showLeftTitles;
   final bool showBottomTitles;
   final bool showGrid;
+  final String? yAxisLabel; // Label for y-axis (e.g., "Price (₱)")
   
   const AxisConfig({
     this.customLabels,
@@ -56,6 +57,7 @@ class AxisConfig {
     this.showLeftTitles = true,
     this.showBottomTitles = true,
     this.showGrid = true,
+    this.yAxisLabel,
   });
 }
 

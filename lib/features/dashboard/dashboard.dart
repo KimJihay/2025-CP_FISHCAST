@@ -264,7 +264,7 @@ class _DashboardPageState extends State<DashboardPage> {
       data: supplyPoints,
       lineConfig: const LineConfig(
         color: Colors.blue,
-        label: 'Supply (Kg)',
+        label: 'Supply',
         lineWidth: 3.0,
         showDots: true,
         showArea: true,
@@ -276,6 +276,7 @@ class _DashboardPageState extends State<DashboardPage> {
         minY: yMin,
         maxY: yMax,
         interval: range > 10000 ? 5000 : 2000,
+        yAxisLabel: 'Supply (Kg)',
       ),
     );
   }
