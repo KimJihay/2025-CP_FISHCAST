@@ -89,7 +89,7 @@ class LinechartWidget extends StatelessWidget {
                     ? Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: RotatedBox(
-                          quarterTurns: -1, // Rotate 90 degrees counter-clockwise
+                          quarterTurns: 1, // Rotate 90 degrees counter-clockwise
                           child: Text(
                             axisConfig.yAxisLabel!,
                             style: TextStyle(
