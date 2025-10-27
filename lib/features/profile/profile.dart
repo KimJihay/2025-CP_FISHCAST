@@ -36,12 +36,12 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUserData() async {
     try {
       UserModel? user = await _authService.getCurrentUserModel();
-      
+
       // Load saved profile picture from local storage
       if (user != null) {
         final prefs = await SharedPreferences.getInstance();
         final savedImagePath = prefs.getString('profile_image_${user.uid}');
-        
+
         if (savedImagePath != null && File(savedImagePath).existsSync()) {
           if (mounted) {
             setState(() {
@@ -50,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
           }
         }
       }
-      
+
       if (mounted) {
         setState(() {
           _user = user;
@@ -140,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _showReauthenticationDialog() async {
     String? signInMethod = _authService.getUserSignInMethod();
-    
+
     if (signInMethod == 'google') {
       // Google Sign-In re-authentication
       try {
@@ -292,7 +292,7 @@ class _ProfilePageState extends State<ProfilePage> {
           // Permission granted - now try to get actual location
           try {
             final locationData = await _locationService.getCurrentLocation();
-            
+
             if (mounted) {
               // Build location display string
               String locationDisplay;
@@ -306,7 +306,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Show coordinates if no address available
                 locationDisplay = 'Lat: ${locationData.latitude.toStringAsFixed(4)}, Lon: ${locationData.longitude.toStringAsFixed(4)}';
               }
-              
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Location enabled! Current location: $locationDisplay'),
@@ -528,20 +528,20 @@ class _ProfilePageState extends State<ProfilePage> {
               _isLoading = false;
             });
           }
-          
+
           try {
             // Show re-authentication dialog
             await _showReauthenticationDialog();
-            
+
             // Retry deletion after successful re-authentication
             if (mounted) {
               setState(() {
                 _isLoading = true;
               });
             }
-            
+
             await _authService.deleteAccount();
-            
+
             // Navigate to login page and clear the navigation stack
             if (mounted) {
               Navigator.of(context).pushAndRemoveUntil(
@@ -678,7 +678,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final iconSize = screenWidth < 360 ? 22.0 : 24.0;
     final fontSize = screenWidth < 360 ? 14.0 : 16.0;
-    
+
     return ListTile(
       leading: Icon(icon, color: kForegroundColor, size: iconSize),
       title: Text(
@@ -709,7 +709,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final avatarRadius = (screenWidth * 0.13).clamp(45.0, 60.0);
     final nameFontSize = screenWidth < 360 ? 20.0 : 24.0;
     final emailFontSize = screenWidth < 360 ? 14.0 : 16.0;
-    
+
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(color: Colors.blue),
@@ -743,7 +743,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildProfilePicture(double radius) {
     final iconSize = radius * 1.0;
-    
+
     // Show local image first if available
     if (_localProfileImage != null) {
       return CircleAvatar(
@@ -752,7 +752,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundImage: FileImage(_localProfileImage!),
       );
     }
-    
+
     // Fall back to network image
     if (_user?.profilePictureUrl != null &&
         _user!.profilePictureUrl!.isNotEmpty) {
