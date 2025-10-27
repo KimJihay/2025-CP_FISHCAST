@@ -4,6 +4,7 @@ import 'package:fishcast/core/widgets/cards/moon_phases_card.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
 import 'package:fishcast/core/services/location_service.dart';
+import 'package:fishcast/core/services/fish_type_service.dart';
 import 'package:fishcast/core/models/location_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fishcast/core/widgets/cards/weather_card.dart';
@@ -17,27 +18,49 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final LocationService _locationService = LocationService();
+  final FishTypeService _fishTypeService = FishTypeService();
+  
   LocationData? _sharedLocation;
   bool _isLoadingLocation = true;
-
+  
+  List<String> fishTypes = [];
+  bool _isLoadingFishTypes = true;
   String dropdownValue = "Galunggong";
-  final List<String> fishTypes = [
-    'Galunggong',
-    'Tilapia',
-    'Bangus',
-    'Tuna',
-    'Maya-maya',
-    'Lapu-lapu',
-    'Hasa-hasa',
-    'Tanigue',
-    'Dalagang-bukid',
-    'Alumahan',
-  ];
 
   @override
   void initState() {
     super.initState();
     _loadLocation();
+    _loadFishTypes();
+  }
+
+  /// Load fish types from API or use defaults
+  Future<void> _loadFishTypes() async {
+    try {
+      final types = await _fishTypeService.getFishTypeNames();
+      
+      if (mounted) {
+        setState(() {
+          fishTypes = types;
+          _isLoadingFishTypes = false;
+          // Ensure dropdownValue is valid
+          if (!fishTypes.contains(dropdownValue) && fishTypes.isNotEmpty) {
+            dropdownValue = fishTypes.first;
+          }
+        });
+      }
+    } catch (e) {
+      // Fallback to default fish types
+      if (mounted) {
+        setState(() {
+          fishTypes = _fishTypeService.getDefaultFishTypeNames();
+          _isLoadingFishTypes = false;
+          if (!fishTypes.contains(dropdownValue) && fishTypes.isNotEmpty) {
+            dropdownValue = fishTypes.first;
+          }
+        });
+      }
+    }
   }
 
   @override
@@ -93,7 +116,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     return Scaffold(
       appBar: AppBar(title: const AppbarWidget()),
-      body: _isLoadingLocation
+      body: _isLoadingLocation || _isLoadingFishTypes
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
               child: Padding(
@@ -263,7 +286,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       SizedBox(
                         height: chartHeight,
                         width: double.infinity,
-                        child: LinechartWidget(pricePoints: pricePoints),
+                        child: LinechartWidget(data: pricePoints),
                       ),
                     ],
                   ),
