@@ -367,7 +367,10 @@ class _DashboardPageState extends State<DashboardPage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Navigate to forecast page
+                            Navigator.of(context).pushNamed('/forecast');
+                          },
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -443,7 +446,10 @@ class _DashboardPageState extends State<DashboardPage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Navigate to forecast page
+                            Navigator.of(context).pushNamed('/forecast');
+                          },
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
