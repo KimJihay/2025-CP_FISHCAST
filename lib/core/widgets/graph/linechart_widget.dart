@@ -86,14 +86,17 @@ class LinechartWidget extends StatelessWidget {
               ),
               leftTitles: AxisTitles(
                 axisNameWidget: axisConfig.yAxisLabel != null
-                    ? Transform.rotate(
-                        angle: -3.14159 / 2, // Rotate -90 degrees
-                        child: Text(
-                          axisConfig.yAxisLabel!,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: RotatedBox(
+                          quarterTurns: -1, // Rotate 90 degrees counter-clockwise
+                          child: Text(
+                            axisConfig.yAxisLabel!,
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       )
