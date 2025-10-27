@@ -88,12 +88,15 @@ class _DashboardPageState extends State<DashboardPage> {
           final displayName =
               _forecastService.apiIdToDisplayName(fishType);
 
-          fishPriceList.add({
-            'fishName': displayName,
-            'price': latestPrice,
-            'changePercentage': changePercentage,
-            'fishType': fishType,
-          });
+          // Filter out invalid entries: skip if price is 0 or negative, or name is empty
+          if (latestPrice > 0 && displayName.isNotEmpty) {
+            fishPriceList.add({
+              'fishName': displayName,
+              'price': latestPrice,
+              'changePercentage': changePercentage,
+              'fishType': fishType,
+            });
+          }
         }
       }
 
