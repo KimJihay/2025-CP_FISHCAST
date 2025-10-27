@@ -3,6 +3,8 @@ import 'package:fishcast/core/widgets/bar/appbar.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/dual_linechart_widget.dart';
 import 'package:fishcast/core/services/fish_type_service.dart';
+import 'package:fishcast/core/services/fish_forecast_service.dart';
+import 'package:fishcast/core/models/fish_forecast_model.dart';
 import 'package:flutter/material.dart';
 
 class ForecastPage extends StatefulWidget {
@@ -14,15 +16,20 @@ class ForecastPage extends StatefulWidget {
 
 class _ForecastPageState extends State<ForecastPage> {
   final FishTypeService _fishTypeService = FishTypeService();
+  final FishForecastService _forecastService = FishForecastService();
   
   List<String> fishTypes = [];
   bool _isLoadingFishTypes = true;
-  String dropdownValue = "Galunggong";
+  bool _isLoadingForecast = false;
+  String dropdownValue = "Galunggong (Round Scad)";
+  FishForecast? _currentForecast;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     _loadFishTypes();
+    _loadForecast();
   }
 
   /// Load fish types from API or use defaults
@@ -54,12 +61,129 @@ class _ForecastPageState extends State<ForecastPage> {
     }
   }
 
+  /// Load forecast data for the selected fish type
+  Future<void> _loadForecast() async {
+    if (mounted) {
+      setState(() {
+        _isLoadingForecast = true;
+        _errorMessage = null;
+      });
+    }
+
+    try {
+      // Convert display name to API identifier
+      final apiId = _forecastService.fishNameToApiId(dropdownValue);
+      final forecast = await _forecastService.getForecast(apiId);
+
+      if (mounted) {
+        setState(() {
+          _currentForecast = forecast;
+          _isLoadingForecast = false;
+          if (forecast == null) {
+            _errorMessage = 'Unable to load forecast. Please try again later.';
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingForecast = false;
+          _errorMessage = 'Error loading forecast: $e';
+        });
+      }
+    }
+  }
+
   void _onFishTypeChanged(String? newValue) {
-    if (newValue != null) {
+    if (newValue != null && newValue != dropdownValue) {
       setState(() {
         dropdownValue = newValue;
       });
+      // Load new forecast for selected fish
+      _loadForecast();
     }
+  }
+
+  /// Build the forecast chart widget
+  Widget _buildForecastChart() {
+    // Loading state
+    if (_isLoadingForecast) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: kSecondaryColor),
+            const SizedBox(height: 16),
+            Text(
+              'Loading forecast...',
+              style: TextStyle(color: kSecondaryTextColor),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Error state
+    if (_errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+            const SizedBox(height: 16),
+            Text(
+              _errorMessage!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.red),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadForecast,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // No data state
+    if (_currentForecast == null || _currentForecast!.forecast.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.info_outline, size: 48, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'No forecast data available',
+              style: TextStyle(color: kSecondaryTextColor),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Convert forecast data to chart points
+    final pricePoints = createChartData(
+      yValues: _currentForecast!.forecast.map((point) => point.price).toList(),
+      labels: _currentForecast!.forecast
+          .map((point) => '${point.date.day}/${point.date.month}')
+          .toList(),
+    );
+
+    // For now, we don't have supply data from the API, so we'll create dummy data
+    // or you can modify the backend to include supply forecasts
+    final supplyPoints = createChartData(
+      yValues: List.generate(7, (i) => 0.0), // Placeholder
+      labels: _currentForecast!.forecast
+          .map((point) => '${point.date.day}/${point.date.month}')
+          .toList(),
+    );
+
+    return DualLinechartWidget(
+      line1Data: pricePoints,
+      line2Data: supplyPoints,
+    );
   }
 
   @override
@@ -166,16 +290,14 @@ class _ForecastPageState extends State<ForecastPage> {
                   ],
                 ),
                 const SizedBox(height: 14),
+                // Chart or Loading/Error state
                 Container(
                   constraints: BoxConstraints(
                     minHeight: 200,
                     maxHeight: chartHeight.clamp(200, 400),
                   ),
                   width: double.infinity,
-                  child: DualLinechartWidget(
-                    line1Data: pricePoints,
-                    line2Data: supplyPoints,
-                  ),
+                  child: _buildForecastChart(),
                 ),
                 SizedBox(height: 15),
                 Text(

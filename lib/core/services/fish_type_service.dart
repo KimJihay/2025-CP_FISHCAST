@@ -14,17 +14,25 @@ class FishTypeService {
   static const Duration _cacheExpiration = Duration(hours: 24);
 
   /// Default fish types (fallback if API fails)
+  /// These match the fish types available in the backend API
   static final List<FishType> _defaultFishTypes = [
-    FishType(id: '1', name: 'Galunggong', scientificName: 'Decapterus macrosoma'),
-    FishType(id: '2', name: 'Tilapia', scientificName: 'Oreochromis niloticus'),
-    FishType(id: '3', name: 'Bangus', scientificName: 'Chanos chanos'),
-    FishType(id: '4', name: 'Tuna', scientificName: 'Thunnus'),
-    FishType(id: '5', name: 'Maya-maya', scientificName: 'Lutjanus campechanus'),
-    FishType(id: '6', name: 'Lapu-lapu', scientificName: 'Epinephelus'),
-    FishType(id: '7', name: 'Hasa-hasa', scientificName: 'Rastrelliger kanagurta'),
-    FishType(id: '8', name: 'Tanigue', scientificName: 'Scomberomorus commerson'),
-    FishType(id: '9', name: 'Dalagang-bukid', scientificName: 'Caesio cuning'),
-    FishType(id: '10', name: 'Alumahan', scientificName: 'Scomber japonicus'),
+    FishType(id: '1', name: 'Alumahan (Striped Mackerel)', scientificName: 'Rastrelliger kanagurta'),
+    FishType(id: '2', name: 'Bangus (Milk Fish)', scientificName: 'Chanos chanos'),
+    FishType(id: '3', name: 'Bariles (Yellow Fin Tuna)', scientificName: 'Thunnus albacares'),
+    FishType(id: '4', name: 'Culisi (Nemipterid)', scientificName: 'Nemipterus'),
+    FishType(id: '5', name: 'Galunggong (Round Scad)', scientificName: 'Decapterus macrosoma'),
+    FishType(id: '6', name: 'Gulyasan or Puyan (Skipjack Tuna)', scientificName: 'Katsuwonus pelamis'),
+    FishType(id: '7', name: 'Lapu-lapu (Grouper)', scientificName: 'Epinephelus'),
+    FishType(id: '8', name: 'Malasugi (Blue Marlin)', scientificName: 'Makaira nigricans'),
+    FishType(id: '9', name: 'Matang Baka (Big-eyed Scads)', scientificName: 'Selar crumenophthalmus'),
+    FishType(id: '10', name: 'Maya-maya (Snapper)', scientificName: 'Lutjanus campechanus'),
+    FishType(id: '11', name: 'Mulmul (Parrot Fish)', scientificName: 'Scaridae'),
+    FishType(id: '12', name: 'Samaral (Siganid)', scientificName: 'Siganus'),
+    FishType(id: '13', name: 'Sting Ray', scientificName: 'Dasyatidae'),
+    FishType(id: '14', name: 'Talakitok (Crevalle)', scientificName: 'Caranx'),
+    FishType(id: '15', name: 'Tamban (Indian Sardines)', scientificName: 'Sardinella longiceps'),
+    FishType(id: '16', name: 'Tanguigue (Spanish Mackerel)', scientificName: 'Scomberomorus commerson'),
+    FishType(id: '17', name: 'Tulingan (Frigate Tuna)', scientificName: 'Auxis thazard'),
   ];
 
   /// Get fish types with caching
