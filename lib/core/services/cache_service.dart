@@ -18,18 +18,25 @@ class CacheService {
   static const int locationCacheDuration = 60; // 1 hour
   static const int moonPhaseCacheDuration = 1440; // 24 hours
 
-  /// Save data to cache with timestamp
-  Future<void> saveCache(String key, Map<String, dynamic> data) async {
+  /// Save data to cache with timestamp and optional expiration
+  Future<void> saveCache(
+    String key, 
+    Map<String, dynamic> data, 
+    [Duration? expiration]
+  ) async {
     await init();
     final cacheData = {
       'data': data,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'expiration_minutes': expiration?.inMinutes,
     };
     await _prefs?.setString(key, jsonEncode(cacheData));
   }
 
   /// Get cached data if not expired
-  Future<Map<String, dynamic>?> getCache(String key, int maxAgeMinutes) async {
+  /// [key] - Cache key
+  /// [maxAge] - Maximum age as Duration or int (minutes). If null, uses stored expiration.
+  Future<Map<String, dynamic>?> getCache(String key, [dynamic maxAge]) async {
     await init();
     final cachedString = _prefs?.getString(key);
 
@@ -40,6 +47,19 @@ class CacheService {
       final timestamp = cacheData['timestamp'] as int;
       final now = DateTime.now().millisecondsSinceEpoch;
       final ageMinutes = (now - timestamp) / 1000 / 60;
+
+      // Determine max age in minutes
+      int maxAgeMinutes;
+      if (maxAge is Duration) {
+        maxAgeMinutes = maxAge.inMinutes;
+      } else if (maxAge is int) {
+        maxAgeMinutes = maxAge;
+      } else if (cacheData['expiration_minutes'] != null) {
+        maxAgeMinutes = cacheData['expiration_minutes'] as int;
+      } else {
+        // No expiration set, return data
+        return cacheData['data'] as Map<String, dynamic>;
+      }
 
       if (ageMinutes < maxAgeMinutes) {
         return cacheData['data'] as Map<String, dynamic>;

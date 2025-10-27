@@ -1,0 +1,513 @@
+Date,Fish_Type,Supply_Kg,Price_Per_Kg,Fuel_price,Ice_price_per_block
+2024/1/1,Alumahan (Striped Mackerel),"1,776 Kg",142,59.15,160
+2024/1/1,Bangus (Milk Fish),"101,326 Kg",188,59.15,160
+2024/1/1,Bariles (Yellow Fin Tuna),345 Kg,200,59.15,160
+2024/1/1,Culisi (Nemipterid),"2,181 Kg",123,59.15,160
+2024/1/1,Galunggong (Round Scad),"5,296 Kg",155,59.15,160
+2024/1/1,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",160,59.15,160
+2024/1/1,Lapu-lapu (Grouper),524 Kg,297,59.15,160
+2024/1/1,Malasugi (Blue Marlin),829 Kg,305,59.15,160
+2024/1/1,Matang Baka (Big-eyed Scads),"25,066 Kg",212,59.15,160
+2024/1/1,Maya-maya (Snapper),484 Kg,301,59.15,160
+2024/1/1,Mulmul (Parrot Fish),378 Kg,215,59.15,160
+2024/1/1,Samaral (Siganid),596 Kg,258,59.15,160
+2024/1/1,Talakitok (Crevalle),"1,233 Kg",251,59.15,160
+2024/1/1,Tamban (Indian Sardines),"5,363 Kg",85,59.15,160
+2024/1/1,Sting Ray,249 Kg,100,59.15,160
+2024/1/1,Tanguigue (Spanish Mackerel),279 Kg,299,59.15,160
+2024/1/1,Tulingan (Frigate Tuna),"1,236 Kg",185,59.15,160
+2024/1/2,Alumahan (Striped Mackerel),"1,776 Kg",142,59.15,160
+2024/1/2,Bangus (Milk Fish),"101,326 Kg",188,59.15,160
+2024/1/2,Bariles (Yellow Fin Tuna),345 Kg,200,59.15,160
+2024/1/2,Culisi (Nemipterid),"2,181 Kg",123,59.15,160
+2024/1/2,Galunggong (Round Scad),"5,296 Kg",155,59.15,160
+2024/1/2,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",160,59.15,160
+2024/1/2,Lapu-lapu (Grouper),524 Kg,297,59.15,160
+2024/1/2,Malasugi (Blue Marlin),829 Kg,305,59.15,160
+2024/1/2,Matang Baka (Big-eyed Scads),"25,066 Kg",212,59.15,160
+2024/1/2,Maya-maya (Snapper),484 Kg,301,59.15,160
+2024/1/2,Mulmul (Parrot Fish),378 Kg,215,59.15,160
+2024/1/2,Samaral (Siganid),596 Kg,258,59.15,160
+2024/1/2,Talakitok (Crevalle),"1,233 Kg",251,59.15,160
+2024/1/2,Tamban (Indian Sardines),"5,363 Kg",85,59.15,160
+2024/1/2,Sting Ray,249 Kg,100,59.15,160
+2024/1/2,Tanguigue (Spanish Mackerel),279 Kg,299,59.15,160
+2024/1/2,Tulingan (Frigate Tuna),"1,236 Kg",185,59.15,160
+2024/1/3,Alumahan (Striped Mackerel),"1,776 Kg",145,59.15,160
+2024/1/3,Bangus (Milk Fish),"101,326 Kg",190,59.15,160
+2024/1/3,Bariles (Yellow Fin Tuna),345 Kg,205,59.15,160
+2024/1/3,Culisi (Nemipterid),"2,181 Kg",128,59.15,160
+2024/1/3,Galunggong (Round Scad),"5,296 Kg",160,59.15,160
+2024/1/3,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",162,59.15,160
+2024/1/3,Lapu-lapu (Grouper),524 Kg,298,59.15,160
+2024/1/3,Malasugi (Blue Marlin),829 Kg,303,59.15,160
+2024/1/3,Matang Baka (Big-eyed Scads),"25,066 Kg",215,59.15,160
+2024/1/3,Maya-maya (Snapper),484 Kg,305,59.15,160
+2024/1/3,Mulmul (Parrot Fish),378 Kg,211,59.15,160
+2024/1/3,Samaral (Siganid),596 Kg,268,59.15,160
+2024/1/3,Talakitok (Crevalle),"1,233 Kg",248,59.15,160
+2024/1/3,Tamban (Indian Sardines),"5,363 Kg",80,59.15,160
+2024/1/3,Sting Ray,249 Kg,106,59.15,160
+2024/1/3,Tanguigue (Spanish Mackerel),279 Kg,203,59.15,160
+2024/1/3,Tulingan (Frigate Tuna),"1,236 Kg",189,59.15,160
+2024/1/4,Alumahan (Striped Mackerel),"1,776 Kg",145,59.15,160
+2024/1/4,Bangus (Milk Fish),"101,326 Kg",190,59.15,160
+2024/1/4,Bariles (Yellow Fin Tuna),345 Kg,205,59.15,160
+2024/1/4,Culisi (Nemipterid),"2,181 Kg",128,59.15,160
+2024/1/4,Galunggong (Round Scad),"5,296 Kg",160,59.15,160
+2024/1/4,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",162,59.15,160
+2024/1/4,Lapu-lapu (Grouper),524 Kg,298,59.15,160
+2024/1/4,Malasugi (Blue Marlin),829 Kg,303,59.15,160
+2024/1/4,Matang Baka (Big-eyed Scads),"25,066 Kg",215,59.15,160
+2024/1/4,Maya-maya (Snapper),484 Kg,305,59.15,160
+2024/1/4,Mulmul (Parrot Fish),378 Kg,211,59.15,160
+2024/1/4,Samaral (Siganid),596 Kg,268,59.15,160
+2024/1/4,Talakitok (Crevalle),"1,233 Kg",248,59.15,160
+2024/1/4,Tamban (Indian Sardines),"5,363 Kg",80,59.15,160
+2024/1/4,Sting Ray,249 Kg,106,59.15,160
+2024/1/4,Tanguigue (Spanish Mackerel),279 Kg,203,59.15,160
+2024/1/4,Tulingan (Frigate Tuna),"1,236 Kg",189,59.15,160
+2024/1/5,Alumahan (Striped Mackerel),"1,776 Kg",150,59.15,160
+2024/1/5,Bangus (Milk Fish),"101,326 Kg",197,59.15,160
+2024/1/5,Bariles (Yellow Fin Tuna),345 Kg,218,59.15,160
+2024/1/5,Culisi (Nemipterid),"2,181 Kg",120,59.15,160
+2024/1/5,Galunggong (Round Scad),"5,296 Kg",125,59.15,160
+2024/1/5,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",130,59.15,160
+2024/1/5,Lapu-lapu (Grouper),524 Kg,283,59.15,160
+2024/1/5,Malasugi (Blue Marlin),829 Kg,250,59.15,160
+2024/1/5,Matang Baka (Big-eyed Scads),"25,066 Kg",164,59.15,160
+2024/1/5,Maya-maya (Snapper),484 Kg,300,59.15,160
+2024/1/5,Mulmul (Parrot Fish),378 Kg,191,59.15,160
+2024/1/5,Samaral (Siganid),596 Kg,275,59.15,160
+2024/1/5,Talakitok (Crevalle),"1,233 Kg",235,59.15,160
+2024/1/5,Tamban (Indian Sardines),"5,363 Kg",70,59.15,160
+2024/1/5,Sting Ray,249 Kg,90,59.15,160
+2024/1/5,Tanguigue (Spanish Mackerel),279 Kg,300,59.15,160
+2024/1/5,Tulingan (Frigate Tuna),"1,236 Kg",203,59.15,160
+2024/1/6,Alumahan (Striped Mackerel),"1,776 Kg",146,59.15,160
+2024/1/6,Bangus (Milk Fish),"101,326 Kg",190,59.15,160
+2024/1/6,Bariles (Yellow Fin Tuna),345 Kg,214,59.15,160
+2024/1/6,Culisi (Nemipterid),"2,181 Kg",120,59.15,160
+2024/1/6,Galunggong (Round Scad),"5,296 Kg",122,59.15,160
+2024/1/6,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",133,59.15,160
+2024/1/6,Lapu-lapu (Grouper),524 Kg,288,59.15,160
+2024/1/6,Malasugi (Blue Marlin),829 Kg,250,59.15,160
+2024/1/6,Matang Baka (Big-eyed Scads),"25,066 Kg",162,59.15,160
+2024/1/6,Maya-maya (Snapper),484 Kg,300,59.15,160
+2024/1/6,Mulmul (Parrot Fish),378 Kg,188,59.15,160
+2024/1/6,Samaral (Siganid),596 Kg,265,59.15,160
+2024/1/6,Talakitok (Crevalle),"1,233 Kg",243,59.15,160
+2024/1/6,Tamban (Indian Sardines),"5,363 Kg",70,59.15,160
+2024/1/6,Sting Ray,249 Kg,93,59.15,160
+2024/1/6,Tanguigue (Spanish Mackerel),279 Kg,306,59.15,160
+2024/1/6,Tulingan (Frigate Tuna),"1,236 Kg",201,59.15,160
+2024/1/7,Alumahan (Striped Mackerel),"1,776 Kg",140,59.15,160
+2024/1/7,Bangus (Milk Fish),"101,326 Kg",182,59.15,160
+2024/1/7,Bariles (Yellow Fin Tuna),345 Kg,210,59.15,160
+2024/1/7,Culisi (Nemipterid),"2,181 Kg",120,59.15,160
+2024/1/7,Galunggong (Round Scad),"5,296 Kg",119,59.15,160
+2024/1/7,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",135,59.15,160
+2024/1/7,Lapu-lapu (Grouper),524 Kg,293,59.15,160
+2024/1/7,Malasugi (Blue Marlin),829 Kg,250,59.15,160
+2024/1/7,Matang Baka (Big-eyed Scads),"25,066 Kg",160,59.15,160
+2024/1/7,Maya-maya (Snapper),484 Kg,300,59.15,160
+2024/1/7,Mulmul (Parrot Fish),378 Kg,185,59.15,160
+2024/1/7,Samaral (Siganid),596 Kg,255,59.15,160
+2024/1/7,Talakitok (Crevalle),"1,233 Kg",250,59.15,160
+2024/1/7,Tamban (Indian Sardines),"5,363 Kg",70,59.15,160
+2024/1/7,Sting Ray,249 Kg,95,59.15,160
+2024/1/7,Tanguigue (Spanish Mackerel),279 Kg,313,59.15,160
+2024/1/7,Tulingan (Frigate Tuna),"1,236 Kg",198,59.15,160
+2024/1/8,Alumahan (Striped Mackerel),"1,776 Kg",135,59.15,160
+2024/1/8,Bangus (Milk Fish),"101,326 Kg",175,59.15,160
+2024/1/8,Bariles (Yellow Fin Tuna),345 Kg,206,59.15,160
+2024/1/8,Culisi (Nemipterid),"2,181 Kg",120,59.15,160
+2024/1/8,Galunggong (Round Scad),"5,296 Kg",116,59.15,160
+2024/1/8,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",138,59.15,160
+2024/1/8,Lapu-lapu (Grouper),524 Kg,298,59.15,160
+2024/1/8,Malasugi (Blue Marlin),829 Kg,250,59.15,160
+2024/1/8,Matang Baka (Big-eyed Scads),"25,066 Kg",158,59.15,160
+2024/1/8,Maya-maya (Snapper),484 Kg,300,59.15,160
+2024/1/8,Mulmul (Parrot Fish),378 Kg,182,59.15,160
+2024/1/8,Samaral (Siganid),596 Kg,245,59.15,160
+2024/1/8,Talakitok (Crevalle),"1,233 Kg",258,59.15,160
+2024/1/8,Tamban (Indian Sardines),"5,363 Kg",70,59.15,160
+2024/1/8,Sting Ray,249 Kg,98,59.15,160
+2024/1/8,Tanguigue (Spanish Mackerel),279 Kg,319,59.15,160
+2024/1/8,Tulingan (Frigate Tuna),"1,236 Kg",196,59.15,160
+2024/1/9,Alumahan (Striped Mackerel),"1,776 Kg",130,59.8,160
+2024/1/9,Bangus (Milk Fish),"101,326 Kg",167,59.8,160
+2024/1/9,Bariles (Yellow Fin Tuna),345 Kg,201,59.8,160
+2024/1/9,Culisi (Nemipterid),"2,181 Kg",120,59.8,160
+2024/1/9,Galunggong (Round Scad),"5,296 Kg",113,59.8,160
+2024/1/9,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",140,59.8,160
+2024/1/9,Lapu-lapu (Grouper),524 Kg,303,59.8,160
+2024/1/9,Malasugi (Blue Marlin),829 Kg,250,59.8,160
+2024/1/9,Matang Baka (Big-eyed Scads),"25,066 Kg",156,59.8,160
+2024/1/9,Maya-maya (Snapper),484 Kg,300,59.8,160
+2024/1/9,Mulmul (Parrot Fish),378 Kg,178,59.8,160
+2024/1/9,Samaral (Siganid),596 Kg,235,59.8,160
+2024/1/9,Talakitok (Crevalle),"1,233 Kg",265,59.8,160
+2024/1/9,Tamban (Indian Sardines),"5,363 Kg",70,59.8,160
+2024/1/9,Sting Ray,249 Kg,100,59.8,160
+2024/1/9,Tanguigue (Spanish Mackerel),279 Kg,325,59.8,160
+2024/1/9,Tulingan (Frigate Tuna),"1,236 Kg",193,59.8,160
+2024/1/10,Alumahan (Striped Mackerel),"1,776 Kg",131,59.8,160
+2024/1/10,Bangus (Milk Fish),"101,326 Kg",173,59.8,160
+2024/1/10,Bariles (Yellow Fin Tuna),345 Kg,201,59.8,160
+2024/1/10,Culisi (Nemipterid),"2,181 Kg",120,59.8,160
+2024/1/10,Galunggong (Round Scad),"5,296 Kg",126,59.8,160
+2024/1/10,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",143,59.8,160
+2024/1/10,Lapu-lapu (Grouper),524 Kg,289,59.8,160
+2024/1/10,Malasugi (Blue Marlin),829 Kg,235,59.8,160
+2024/1/10,Matang Baka (Big-eyed Scads),"25,066 Kg",161,59.8,160
+2024/1/10,Maya-maya (Snapper),484 Kg,300,59.8,160
+2024/1/10,Mulmul (Parrot Fish),378 Kg,182,59.8,160
+2024/1/10,Samaral (Siganid),596 Kg,240,59.8,160
+2024/1/10,Talakitok (Crevalle),"1,233 Kg",250,59.8,160
+2024/1/10,Tamban (Indian Sardines),"5,363 Kg",70,59.8,160
+2024/1/10,Sting Ray,249 Kg,100,59.8,160
+2024/1/10,Tanguigue (Spanish Mackerel),279 Kg,300,59.8,160
+2024/1/10,Tulingan (Frigate Tuna),"1,236 Kg",187,59.8,160
+2024/1/11,Alumahan (Striped Mackerel),"1,776 Kg",131,59.8,160
+2024/1/11,Bangus (Milk Fish),"101,326 Kg",179,59.8,160
+2024/1/11,Bariles (Yellow Fin Tuna),345 Kg,201,59.8,160
+2024/1/11,Culisi (Nemipterid),"2,181 Kg",120,59.8,160
+2024/1/11,Galunggong (Round Scad),"5,296 Kg",140,59.8,160
+2024/1/11,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",145,59.8,160
+2024/1/11,Lapu-lapu (Grouper),524 Kg,275,59.8,160
+2024/1/11,Malasugi (Blue Marlin),829 Kg,220,59.8,160
+2024/1/11,Matang Baka (Big-eyed Scads),"25,066 Kg",167,59.8,160
+2024/1/11,Maya-maya (Snapper),484 Kg,300,59.8,160
+2024/1/11,Mulmul (Parrot Fish),378 Kg,185,59.8,160
+2024/1/11,Samaral (Siganid),596 Kg,245,59.8,160
+2024/1/11,Talakitok (Crevalle),"1,233 Kg",235,59.8,160
+2024/1/11,Tamban (Indian Sardines),"5,363 Kg",70,59.8,160
+2024/1/11,Sting Ray,249 Kg,100,59.8,160
+2024/1/11,Tanguigue (Spanish Mackerel),279 Kg,275,59.8,160
+2024/1/11,Tulingan (Frigate Tuna),"1,236 Kg",180,59.8,160
+2024/1/12,Alumahan (Striped Mackerel),"1,776 Kg",139,59.8,160
+2024/1/12,Bangus (Milk Fish),"101,326 Kg",183,59.8,160
+2024/1/12,Bariles (Yellow Fin Tuna),345 Kg,204,59.8,160
+2024/1/12,Culisi (Nemipterid),"2,181 Kg",122,59.8,160
+2024/1/12,Galunggong (Round Scad),"5,296 Kg",145,59.8,160
+2024/1/12,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",154,59.8,160
+2024/1/12,Lapu-lapu (Grouper),524 Kg,280,59.8,160
+2024/1/12,Malasugi (Blue Marlin),829 Kg,231,59.8,160
+2024/1/12,Matang Baka (Big-eyed Scads),"25,066 Kg",173,59.8,160
+2024/1/12,Maya-maya (Snapper),484 Kg,305,59.8,160
+2024/1/12,Mulmul (Parrot Fish),378 Kg,190,59.8,160
+2024/1/12,Samaral (Siganid),596 Kg,251,59.8,160
+2024/1/12,Talakitok (Crevalle),"1,233 Kg",240,59.8,160
+2024/1/12,Tamban (Indian Sardines),"5,363 Kg",72,59.8,160
+2024/1/12,Sting Ray,249 Kg,100,59.8,160
+2024/1/12,Tanguigue (Spanish Mackerel),279 Kg,281,59.8,160
+2024/1/12,Tulingan (Frigate Tuna),"1,236 Kg",182,59.8,160
+2024/1/13,Alumahan (Striped Mackerel),"1,776 Kg",147,59.8,160
+2024/1/13,Bangus (Milk Fish),"101,326 Kg",186,59.8,160
+2024/1/13,Bariles (Yellow Fin Tuna),345 Kg,207,59.8,160
+2024/1/13,Culisi (Nemipterid),"2,181 Kg",124,59.8,160
+2024/1/13,Galunggong (Round Scad),"5,296 Kg",150,59.8,160
+2024/1/13,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",163,59.8,160
+2024/1/13,Lapu-lapu (Grouper),524 Kg,284,59.8,160
+2024/1/13,Malasugi (Blue Marlin),829 Kg,242,59.8,160
+2024/1/13,Matang Baka (Big-eyed Scads),"25,066 Kg",180,59.8,160
+2024/1/13,Maya-maya (Snapper),484 Kg,310,59.8,160
+2024/1/13,Mulmul (Parrot Fish),378 Kg,194,59.8,160
+2024/1/13,Samaral (Siganid),596 Kg,257,59.8,160
+2024/1/13,Talakitok (Crevalle),"1,233 Kg",245,59.8,160
+2024/1/13,Tamban (Indian Sardines),"5,363 Kg",74,59.8,160
+2024/1/13,Sting Ray,249 Kg,100,59.8,160
+2024/1/13,Tanguigue (Spanish Mackerel),279 Kg,287,59.8,160
+2024/1/13,Tulingan (Frigate Tuna),"1,236 Kg",183,59.8,160
+2024/1/14,Alumahan (Striped Mackerel),"1,776 Kg",155,59.8,160
+2024/1/14,Bangus (Milk Fish),"101,326 Kg",190,59.8,160
+2024/1/14,Bariles (Yellow Fin Tuna),345 Kg,210,59.8,160
+2024/1/14,Culisi (Nemipterid),"2,181 Kg",126,59.8,160
+2024/1/14,Galunggong (Round Scad),"5,296 Kg",155,59.8,160
+2024/1/14,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",172,59.8,160
+2024/1/14,Lapu-lapu (Grouper),524 Kg,289,59.8,160
+2024/1/14,Malasugi (Blue Marlin),829 Kg,253,59.8,160
+2024/1/14,Matang Baka (Big-eyed Scads),"25,066 Kg",186,59.8,160
+2024/1/14,Maya-maya (Snapper),484 Kg,315,59.8,160
+2024/1/14,Mulmul (Parrot Fish),378 Kg,199,59.8,160
+2024/1/14,Samaral (Siganid),596 Kg,263,59.8,160
+2024/1/14,Talakitok (Crevalle),"1,233 Kg",250,59.8,160
+2024/1/14,Tamban (Indian Sardines),"5,363 Kg",76,59.8,160
+2024/1/14,Sting Ray,249 Kg,100,59.8,160
+2024/1/14,Tanguigue (Spanish Mackerel),279 Kg,293,59.8,160
+2024/1/14,Tulingan (Frigate Tuna),"1,236 Kg",185,59.8,160
+2024/1/15,Alumahan (Striped Mackerel),"1,776 Kg",163,59.8,160
+2024/1/15,Bangus (Milk Fish),"101,326 Kg",194,59.8,160
+2024/1/15,Bariles (Yellow Fin Tuna),345 Kg,213,59.8,160
+2024/1/15,Culisi (Nemipterid),"2,181 Kg",128,59.8,160
+2024/1/15,Galunggong (Round Scad),"5,296 Kg",160,59.8,160
+2024/1/15,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",181,59.8,160
+2024/1/15,Lapu-lapu (Grouper),524 Kg,293,59.8,160
+2024/1/15,Malasugi (Blue Marlin),829 Kg,264,59.8,160
+2024/1/15,Matang Baka (Big-eyed Scads),"25,066 Kg",192,59.8,160
+2024/1/15,Maya-maya (Snapper),484 Kg,320,59.8,160
+2024/1/15,Mulmul (Parrot Fish),378 Kg,203,59.8,160
+2024/1/15,Samaral (Siganid),596 Kg,269,59.8,160
+2024/1/15,Talakitok (Crevalle),"1,233 Kg",255,59.8,160
+2024/1/15,Tamban (Indian Sardines),"5,363 Kg",77,59.8,160
+2024/1/15,Sting Ray,249 Kg,100,59.8,160
+2024/1/15,Tanguigue (Spanish Mackerel),279 Kg,299,59.8,160
+2024/1/15,Tulingan (Frigate Tuna),"1,236 Kg",187,59.8,160
+2024/1/16,Alumahan (Striped Mackerel),"1,776 Kg",171,59.4,160
+2024/1/16,Bangus (Milk Fish),"101,326 Kg",198,59.4,160
+2024/1/16,Bariles (Yellow Fin Tuna),345 Kg,216,59.4,160
+2024/1/16,Culisi (Nemipterid),"2,181 Kg",130,59.4,160
+2024/1/16,Galunggong (Round Scad),"5,296 Kg",165,59.4,160
+2024/1/16,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",190,59.4,160
+2024/1/16,Lapu-lapu (Grouper),524 Kg,298,59.4,160
+2024/1/16,Malasugi (Blue Marlin),829 Kg,338,59.4,160
+2024/1/16,Matang Baka (Big-eyed Scads),"25,066 Kg",199,59.4,160
+2024/1/16,Maya-maya (Snapper),484 Kg,325,59.4,160
+2024/1/16,Mulmul (Parrot Fish),378 Kg,208,59.4,160
+2024/1/16,Samaral (Siganid),596 Kg,275,59.4,160
+2024/1/16,Talakitok (Crevalle),"1,233 Kg",260,59.4,160
+2024/1/16,Tamban (Indian Sardines),"5,363 Kg",79,59.4,160
+2024/1/16,Sting Ray,249 Kg,100,59.4,160
+2024/1/16,Tanguigue (Spanish Mackerel),279 Kg,305,59.4,160
+2024/1/16,Tulingan (Frigate Tuna),"1,236 Kg",188,59.4,160
+2024/1/17,Alumahan (Striped Mackerel),"1,776 Kg",171,59.4,160
+2024/1/17,Bangus (Milk Fish),"101,326 Kg",200,59.4,160
+2024/1/17,Bariles (Yellow Fin Tuna),345 Kg,217,59.4,160
+2024/1/17,Culisi (Nemipterid),"2,181 Kg",130,59.4,160
+2024/1/17,Galunggong (Round Scad),"5,296 Kg",162,59.4,160
+2024/1/17,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",184,59.4,160
+2024/1/17,Lapu-lapu (Grouper),524 Kg,291,59.4,160
+2024/1/17,Malasugi (Blue Marlin),829 Kg,338,59.4,160
+2024/1/17,Matang Baka (Big-eyed Scads),"25,066 Kg",202,59.4,160
+2024/1/17,Maya-maya (Snapper),484 Kg,320,59.4,160
+2024/1/17,Mulmul (Parrot Fish),378 Kg,209,59.4,160
+2024/1/17,Samaral (Siganid),596 Kg,266,59.4,160
+2024/1/17,Talakitok (Crevalle),"1,233 Kg",261,59.4,160
+2024/1/17,Tamban (Indian Sardines),"5,363 Kg",79,59.4,160
+2024/1/17,Sting Ray,249 Kg,99,59.4,160
+2024/1/17,Tanguigue (Spanish Mackerel),279 Kg,304,59.4,160
+2024/1/17,Tulingan (Frigate Tuna),"1,236 Kg",188,59.4,160
+2024/1/18,Alumahan (Striped Mackerel),"1,776 Kg",170,59.4,160
+2024/1/18,Bangus (Milk Fish),"101,326 Kg",202,59.4,160
+2024/1/18,Bariles (Yellow Fin Tuna),345 Kg,218,59.4,160
+2024/1/18,Culisi (Nemipterid),"2,181 Kg",130,59.4,160
+2024/1/18,Galunggong (Round Scad),"5,296 Kg",159,59.4,160
+2024/1/18,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",177,59.4,160
+2024/1/18,Lapu-lapu (Grouper),524 Kg,285,59.4,160
+2024/1/18,Malasugi (Blue Marlin),829 Kg,338,59.4,160
+2024/1/18,Matang Baka (Big-eyed Scads),"25,066 Kg",204,59.4,160
+2024/1/18,Maya-maya (Snapper),484 Kg,315,59.4,160
+2024/1/18,Mulmul (Parrot Fish),378 Kg,210,59.4,160
+2024/1/18,Samaral (Siganid),596 Kg,258,59.4,160
+2024/1/18,Talakitok (Crevalle),"1,233 Kg",261,59.4,160
+2024/1/18,Tamban (Indian Sardines),"5,363 Kg",79,59.4,160
+2024/1/18,Sting Ray,249 Kg,97,59.4,160
+2024/1/18,Tanguigue (Spanish Mackerel),279 Kg,304,59.4,160
+2024/1/18,Tulingan (Frigate Tuna),"1,236 Kg",187,59.4,160
+2024/1/19,Alumahan (Striped Mackerel),"1,776 Kg",169,59.4,160
+2024/1/19,Bangus (Milk Fish),"101,326 Kg",203,59.4,160
+2024/1/19,Bariles (Yellow Fin Tuna),345 Kg,218,59.4,160
+2024/1/19,Culisi (Nemipterid),"2,181 Kg",130,59.4,160
+2024/1/19,Galunggong (Round Scad),"5,296 Kg",156,59.4,160
+2024/1/19,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",171,59.4,160
+2024/1/19,Lapu-lapu (Grouper),524 Kg,279,59.4,160
+2024/1/19,Malasugi (Blue Marlin),829 Kg,339,59.4,160
+2024/1/19,Matang Baka (Big-eyed Scads),"25,066 Kg",207,59.4,160
+2024/1/19,Maya-maya (Snapper),484 Kg,310,59.4,160
+2024/1/19,Mulmul (Parrot Fish),378 Kg,211,59.4,160
+2024/1/19,Samaral (Siganid),596 Kg,249,59.4,160
+2024/1/19,Talakitok (Crevalle),"1,233 Kg",262,59.4,160
+2024/1/19,Tamban (Indian Sardines),"5,363 Kg",80,59.4,160
+2024/1/19,Sting Ray,249 Kg,96,59.4,160
+2024/1/19,Tanguigue (Spanish Mackerel),279 Kg,303,59.4,160
+2024/1/19,Tulingan (Frigate Tuna),"1,236 Kg",186,59.4,160
+2024/1/20,Alumahan (Striped Mackerel),"1,776 Kg",168,59.4,160
+2024/1/20,Bangus (Milk Fish),"101,326 Kg",205,59.4,160
+2024/1/20,Bariles (Yellow Fin Tuna),345 Kg,219,59.4,160
+2024/1/20,Culisi (Nemipterid),"2,181 Kg",130,59.4,160
+2024/1/20,Galunggong (Round Scad),"5,296 Kg",154,59.4,160
+2024/1/20,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",164,59.4,160
+2024/1/20,Lapu-lapu (Grouper),524 Kg,273,59.4,160
+2024/1/20,Malasugi (Blue Marlin),829 Kg,339,59.4,160
+2024/1/20,Matang Baka (Big-eyed Scads),"25,066 Kg",209,59.4,160
+2024/1/20,Maya-maya (Snapper),484 Kg,305,59.4,160
+2024/1/20,Mulmul (Parrot Fish),378 Kg,211,59.4,160
+2024/1/20,Samaral (Siganid),596 Kg,241,59.4,160
+2024/1/20,Talakitok (Crevalle),"1,233 Kg",263,59.4,160
+2024/1/20,Tamban (Indian Sardines),"5,363 Kg",80,59.4,160
+2024/1/20,Sting Ray,249 Kg,94,59.4,160
+2024/1/20,Tanguigue (Spanish Mackerel),279 Kg,302,59.4,160
+2024/1/20,Tulingan (Frigate Tuna),"1,236 Kg",186,59.4,160
+2024/1/21,Alumahan (Striped Mackerel),"1,776 Kg",168,59.4,160
+2024/1/21,Bangus (Milk Fish),"101,326 Kg",207,59.4,160
+2024/1/21,Bariles (Yellow Fin Tuna),345 Kg,220,59.4,160
+2024/1/21,Culisi (Nemipterid),"2,181 Kg",130,59.4,160
+2024/1/21,Galunggong (Round Scad),"5,296 Kg",151,59.4,160
+2024/1/21,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",158,59.4,160
+2024/1/21,Lapu-lapu (Grouper),524 Kg,267,59.4,160
+2024/1/21,Malasugi (Blue Marlin),829 Kg,339,59.4,160
+2024/1/21,Matang Baka (Big-eyed Scads),"25,066 Kg",212,59.4,160
+2024/1/21,Maya-maya (Snapper),484 Kg,300,59.4,160
+2024/1/21,Mulmul (Parrot Fish),378 Kg,212,59.4,160
+2024/1/21,Samaral (Siganid),596 Kg,232,59.4,160
+2024/1/21,Talakitok (Crevalle),"1,233 Kg",264,59.4,160
+2024/1/21,Tamban (Indian Sardines),"5,363 Kg",80,59.4,160
+2024/1/21,Sting Ray,249 Kg,93,59.4,160
+2024/1/21,Tanguigue (Spanish Mackerel),279 Kg,301,59.4,160
+2024/1/21,Tulingan (Frigate Tuna),"1,236 Kg",185,59.4,160
+2024/1/22,Alumahan (Striped Mackerel),"1,776 Kg",167,59.4,160
+2024/1/22,Bangus (Milk Fish),"101,326 Kg",209,59.4,160
+2024/1/22,Bariles (Yellow Fin Tuna),345 Kg,221,59.4,160
+2024/1/22,Culisi (Nemipterid),"2,181 Kg",130,59.4,160
+2024/1/22,Galunggong (Round Scad),"5,296 Kg",148,59.4,160
+2024/1/22,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",151,59.4,160
+2024/1/22,Lapu-lapu (Grouper),524 Kg,261,59.4,160
+2024/1/22,Malasugi (Blue Marlin),829 Kg,340,59.4,160
+2024/1/22,Matang Baka (Big-eyed Scads),"25,066 Kg",215,59.4,160
+2024/1/22,Maya-maya (Snapper),484 Kg,295,59.4,160
+2024/1/22,Mulmul (Parrot Fish),378 Kg,213,59.4,160
+2024/1/22,Samaral (Siganid),596 Kg,224,59.4,160
+2024/1/22,Talakitok (Crevalle),"1,233 Kg",264,59.4,160
+2024/1/22,Tamban (Indian Sardines),"5,363 Kg",80,59.4,160
+2024/1/22,Sting Ray,249 Kg,91,59.4,160
+2024/1/22,Tanguigue (Spanish Mackerel),279 Kg,301,59.4,160
+2024/1/22,Tulingan (Frigate Tuna),"1,236 Kg",184,59.4,160
+2024/1/23,Alumahan (Striped Mackerel),"1,776 Kg",166,60.7,160
+2024/1/23,Bangus (Milk Fish),"101,326 Kg",211,60.7,160
+2024/1/23,Bariles (Yellow Fin Tuna),345 Kg,221,60.7,160
+2024/1/23,Culisi (Nemipterid),"2,181 Kg",130,60.7,160
+2024/1/23,Galunggong (Round Scad),"5,296 Kg",145,60.7,160
+2024/1/23,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",145,60.7,160
+2024/1/23,Lapu-lapu (Grouper),524 Kg,255,60.7,160
+2024/1/23,Malasugi (Blue Marlin),829 Kg,340,60.7,160
+2024/1/23,Matang Baka (Big-eyed Scads),"25,066 Kg",217,60.7,160
+2024/1/23,Maya-maya (Snapper),484 Kg,290,60.7,160
+2024/1/23,Mulmul (Parrot Fish),378 Kg,214,60.7,160
+2024/1/23,Samaral (Siganid),596 Kg,215,60.7,160
+2024/1/23,Talakitok (Crevalle),"1,233 Kg",265,60.7,160
+2024/1/23,Tamban (Indian Sardines),"5,363 Kg",80,60.7,160
+2024/1/23,Sting Ray,249 Kg,90,60.7,160
+2024/1/23,Tanguigue (Spanish Mackerel),279 Kg,300,60.7,160
+2024/1/23,Tulingan (Frigate Tuna),"1,236 Kg",184,60.7,160
+2024/1/24,Alumahan (Striped Mackerel),"1,776 Kg",168,60.7,160
+2024/1/24,Bangus (Milk Fish),"101,326 Kg",207,60.7,160
+2024/1/24,Bariles (Yellow Fin Tuna),345 Kg,215,60.7,160
+2024/1/24,Culisi (Nemipterid),"2,181 Kg",127,60.7,160
+2024/1/24,Galunggong (Round Scad),"5,296 Kg",148,60.7,160
+2024/1/24,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",155,60.7,160
+2024/1/24,Lapu-lapu (Grouper),524 Kg,239,60.7,160
+2024/1/24,Malasugi (Blue Marlin),829 Kg,307,60.7,160
+2024/1/24,Matang Baka (Big-eyed Scads),"25,066 Kg",236,60.7,160
+2024/1/24,Maya-maya (Snapper),484 Kg,302,60.7,160
+2024/1/24,Mulmul (Parrot Fish),378 Kg,213,60.7,160
+2024/1/24,Samaral (Siganid),596 Kg,232,60.7,160
+2024/1/24,Talakitok (Crevalle),"1,233 Kg",257,60.7,160
+2024/1/24,Tamban (Indian Sardines),"5,363 Kg",85,60.7,160
+2024/1/24,Sting Ray,249 Kg,92,60.7,160
+2024/1/24,Tanguigue (Spanish Mackerel),279 Kg,297,60.7,160
+2024/1/24,Tulingan (Frigate Tuna),"1,236 Kg",178,60.7,160
+2024/1/25,Alumahan (Striped Mackerel),"1,776 Kg",170,60.7,160
+2024/1/25,Bangus (Milk Fish),"101,326 Kg",203,60.7,160
+2024/1/25,Bariles (Yellow Fin Tuna),345 Kg,208,60.7,160
+2024/1/25,Culisi (Nemipterid),"2,181 Kg",125,60.7,160
+2024/1/25,Galunggong (Round Scad),"5,296 Kg",152,60.7,160
+2024/1/25,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",165,60.7,160
+2024/1/25,Lapu-lapu (Grouper),524 Kg,223,60.7,160
+2024/1/25,Malasugi (Blue Marlin),829 Kg,273,60.7,160
+2024/1/25,Matang Baka (Big-eyed Scads),"25,066 Kg",255,60.7,160
+2024/1/25,Maya-maya (Snapper),484 Kg,313,60.7,160
+2024/1/25,Mulmul (Parrot Fish),378 Kg,212,60.7,160
+2024/1/25,Samaral (Siganid),596 Kg,248,60.7,160
+2024/1/25,Talakitok (Crevalle),"1,233 Kg",248,60.7,160
+2024/1/25,Tamban (Indian Sardines),"5,363 Kg",90,60.7,160
+2024/1/25,Sting Ray,249 Kg,93,60.7,160
+2024/1/25,Tanguigue (Spanish Mackerel),279 Kg,293,60.7,160
+2024/1/25,Tulingan (Frigate Tuna),"1,236 Kg",173,60.7,160
+2024/1/26,Alumahan (Striped Mackerel),"1,776 Kg",173,60.7,160
+2024/1/26,Bangus (Milk Fish),"101,326 Kg",199,60.7,160
+2024/1/26,Bariles (Yellow Fin Tuna),345 Kg,201,60.7,160
+2024/1/26,Culisi (Nemipterid),"2,181 Kg",122,60.7,160
+2024/1/26,Galunggong (Round Scad),"5,296 Kg",170,60.7,160
+2024/1/26,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",175,60.7,160
+2024/1/26,Lapu-lapu (Grouper),524 Kg,208,60.7,160
+2024/1/26,Malasugi (Blue Marlin),829 Kg,240,60.7,160
+2024/1/26,Matang Baka (Big-eyed Scads),"25,066 Kg",273,60.7,160
+2024/1/26,Maya-maya (Snapper),484 Kg,286,60.7,160
+2024/1/26,Mulmul (Parrot Fish),378 Kg,211,60.7,160
+2024/1/26,Samaral (Siganid),596 Kg,301,60.7,160
+2024/1/26,Talakitok (Crevalle),"1,233 Kg",240,60.7,160
+2024/1/26,Tamban (Indian Sardines),"5,363 Kg",80,60.7,160
+2024/1/26,Sting Ray,249 Kg,95,60.7,160
+2024/1/26,Tanguigue (Spanish Mackerel),279 Kg,258,60.7,160
+2024/1/26,Tulingan (Frigate Tuna),"1,236 Kg",167,60.7,160
+2024/1/27,Alumahan (Striped Mackerel),"1,776 Kg",174,60.7,160
+2024/1/27,Bangus (Milk Fish),"101,326 Kg",204,60.7,160
+2024/1/27,Bariles (Yellow Fin Tuna),345 Kg,206,60.7,160
+2024/1/27,Culisi (Nemipterid),"2,181 Kg",127,60.7,160
+2024/1/27,Galunggong (Round Scad),"5,296 Kg",174,60.7,160
+2024/1/27,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",175,60.7,160
+2024/1/27,Lapu-lapu (Grouper),524 Kg,262,60.7,160
+2024/1/27,Malasugi (Blue Marlin),829 Kg,268,60.7,160
+2024/1/27,Matang Baka (Big-eyed Scads),"25,066 Kg",257,60.7,160
+2024/1/27,Maya-maya (Snapper),484 Kg,289,60.7,160
+2024/1/27,Mulmul (Parrot Fish),378 Kg,214,60.7,160
+2024/1/27,Samaral (Siganid),596 Kg,297,60.7,160
+2024/1/27,Talakitok (Crevalle),"1,233 Kg",248,60.7,160
+2024/1/27,Tamban (Indian Sardines),"5,363 Kg",81,60.7,160
+2024/1/27,Sting Ray,249 Kg,94,60.7,160
+2024/1/27,Tanguigue (Spanish Mackerel),279 Kg,262,60.7,160
+2024/1/27,Tulingan (Frigate Tuna),"1,236 Kg",168,60.7,160
+2024/1/28,Alumahan (Striped Mackerel),"1,776 Kg",176,60.7,160
+2024/1/28,Bangus (Milk Fish),"101,326 Kg",209,60.7,160
+2024/1/28,Bariles (Yellow Fin Tuna),345 Kg,211,60.7,160
+2024/1/28,Culisi (Nemipterid),"2,181 Kg",131,60.7,160
+2024/1/28,Galunggong (Round Scad),"5,296 Kg",178,60.7,160
+2024/1/28,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",175,60.7,160
+2024/1/28,Lapu-lapu (Grouper),524 Kg,316,60.7,160
+2024/1/28,Malasugi (Blue Marlin),829 Kg,295,60.7,160
+2024/1/28,Matang Baka (Big-eyed Scads),"25,066 Kg",241,60.7,160
+2024/1/28,Maya-maya (Snapper),484 Kg,291,60.7,160
+2024/1/28,Mulmul (Parrot Fish),378 Kg,217,60.7,160
+2024/1/28,Samaral (Siganid),596 Kg,293,60.7,160
+2024/1/28,Talakitok (Crevalle),"1,233 Kg",255,60.7,160
+2024/1/28,Tamban (Indian Sardines),"5,363 Kg",82,60.7,160
+2024/1/28,Sting Ray,249 Kg,92,60.7,160
+2024/1/28,Tanguigue (Spanish Mackerel),279 Kg,265,60.7,160
+2024/1/28,Tulingan (Frigate Tuna),"1,236 Kg",169,60.7,160
+2024/1/29,Alumahan (Striped Mackerel),"1,776 Kg",178,60.7,160
+2024/1/29,Bangus (Milk Fish),"101,326 Kg",215,60.7,160
+2024/1/29,Bariles (Yellow Fin Tuna),345 Kg,216,60.7,160
+2024/1/29,Culisi (Nemipterid),"2,181 Kg",136,60.7,160
+2024/1/29,Galunggong (Round Scad),"5,296 Kg",183,60.7,160
+2024/1/29,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",175,60.7,160
+2024/1/29,Lapu-lapu (Grouper),524 Kg,371,60.7,160
+2024/1/29,Malasugi (Blue Marlin),829 Kg,323,60.7,160
+2024/1/29,Matang Baka (Big-eyed Scads),"25,066 Kg",225,60.7,160
+2024/1/29,Maya-maya (Snapper),484 Kg,294,60.7,160
+2024/1/29,Mulmul (Parrot Fish),378 Kg,220,60.7,160
+2024/1/29,Samaral (Siganid),596 Kg,289,60.7,160
+2024/1/29,Talakitok (Crevalle),"1,233 Kg",263,60.7,160
+2024/1/29,Tamban (Indian Sardines),"5,363 Kg",82,60.7,160
+2024/1/29,Sting Ray,249 Kg,90,60.7,160
+2024/1/29,Tanguigue (Spanish Mackerel),279 Kg,269,60.7,160
+2024/1/29,Tulingan (Frigate Tuna),"1,236 Kg",170,60.7,160
+2024/1/30,Alumahan (Striped Mackerel),"1,776 Kg",179,63.6,160
+2024/1/30,Bangus (Milk Fish),"101,326 Kg",220,63.6,160
+2024/1/30,Bariles (Yellow Fin Tuna),345 Kg,221,63.6,160
+2024/1/30,Culisi (Nemipterid),"2,181 Kg",149,63.6,160
+2024/1/30,Galunggong (Round Scad),"5,296 Kg",187,63.6,160
+2024/1/30,Gulyasan or puyan (Skipjack tuna),"2,799 Kg",175,63.6,160
+2024/1/30,Lapu-lapu (Grouper),524 Kg,405,63.6,160
+2024/1/30,Malasugi (Blue Marlin),829 Kg,350,63.6,160
+2024/1/30,Matang Baka (Big-eyed Scads),"25,066 Kg",209,63.6,160
+2024/1/30,Maya-maya (Snapper),484 Kg,296,63.6,160
+2024/1/30,Mulmul (Parrot Fish),378 Kg,223,63.6,160
+2024/1/30,Samaral (Siganid),596 Kg,285,63.6,160
+2024/1/30,Talakitok (Crevalle),"1,233 Kg",204,63.6,160
+2024/1/30,Tamban (Indian Sardines),"5,363 Kg",83,63.6,160
+2024/1/30,Sting Ray,249 Kg,89,63.6,160
+2024/1/30,Tanguigue (Spanish Mackerel),279 Kg,272,63.6,160
+2024/1/30,Tulingan (Frigate Tuna),"1,236 Kg",170,63.6,160
+,,,,,
+, ,,,,
