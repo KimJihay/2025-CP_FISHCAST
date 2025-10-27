@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../core/utils/constants.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/services/location_service.dart';
 import '../../core/models/user_model.dart';
 import '../authentication/login_page.dart';
 import '../settings/settings_page.dart';
 import 'legal/privacy_policy_page.dart';
 import 'legal/terms_of_use_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
@@ -18,9 +20,12 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final AuthService _authService = AuthService();
+  final LocationService _locationService = LocationService();
   UserModel? _user;
   bool _isLoading = true;
+  bool _isCheckingLocation = false;
   File? _localProfileImage;
+  LocationPermission? _locationPermission;
 
   @override
   void initState() {
@@ -214,6 +219,137 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     } else {
       throw Exception('Unknown sign-in method');
+    }
+  }
+
+  Future<void> _handleLocationPermission() async {
+    setState(() {
+      _isCheckingLocation = true;
+    });
+
+    try {
+      // Check if location services are enabled
+      bool serviceEnabled = await _locationService.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location services are disabled. Please enable them in your device settings.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          // Open location settings
+          await Geolocator.openLocationSettings();
+        }
+        return;
+      }
+
+      // Check current permission status
+      LocationPermission permission = await _locationService.checkPermission();
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          // Show dialog to open app settings
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Location Permission Required'),
+              content: const Text(
+                'Location permission is permanently denied. Please enable it in app settings to use location features.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await Geolocator.openAppSettings();
+                  },
+                  child: const Text('Open Settings'),
+                ),
+              ],
+            ),
+          );
+        }
+        return;
+      }
+
+      if (permission == LocationPermission.denied) {
+        // Request permission
+        permission = await _locationService.requestPermission();
+      }
+
+      if (mounted) {
+        setState(() {
+          _locationPermission = permission;
+        });
+
+        if (permission == LocationPermission.whileInUse ||
+            permission == LocationPermission.always) {
+          // Permission granted - now try to get actual location
+          try {
+            final locationData = await _locationService.getCurrentLocation();
+            
+            if (mounted) {
+              // Build location display string
+              String locationDisplay;
+              if (locationData.city != null && locationData.city!.isNotEmpty) {
+                locationDisplay = '${locationData.city}, ${locationData.country ?? "Unknown"}';
+              } else if (locationData.administrativeArea != null && locationData.administrativeArea!.isNotEmpty) {
+                locationDisplay = '${locationData.administrativeArea}, ${locationData.country ?? "Unknown"}';
+              } else if (locationData.country != null && locationData.country!.isNotEmpty) {
+                locationDisplay = locationData.country!;
+              } else {
+                // Show coordinates if no address available
+                locationDisplay = 'Lat: ${locationData.latitude.toStringAsFixed(4)}, Lon: ${locationData.longitude.toStringAsFixed(4)}';
+              }
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Location enabled! Current location: $locationDisplay'),
+                  backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 4),
+                ),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Permission granted but failed to get location: $e'),
+                  backgroundColor: Colors.orange,
+                  duration: const Duration(seconds: 4),
+                ),
+              );
+            }
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permission denied'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error checking location: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCheckingLocation = false;
+        });
+      }
     }
   }
 
@@ -479,6 +615,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               _loadUserData();
                             }
                           },
+                        ),
+                        _buildDivider(),
+                        _buildListTile(
+                          icon: Icons.location_on,
+                          text: 'Enable Location',
+                          onTap: _handleLocationPermission,
                         ),
                         _buildDivider(),
                         _buildListTile(

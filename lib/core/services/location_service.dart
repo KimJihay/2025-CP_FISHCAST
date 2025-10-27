@@ -61,25 +61,46 @@ class LocationService {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
+        String? city = place.locality ?? place.subAdministrativeArea;
+        String? country = place.country;
+        
+        // If city is null or empty, use Zamboanga City as fallback
+        if (city == null || city.isEmpty) {
+          return LocationData(
+            latitude: 6.9214,
+            longitude: 122.0790,
+            city: "Zamboanga City",
+            country: "Philippines",
+            administrativeArea: "Zamboanga Peninsula",
+          );
+        }
+        
         return LocationData(
           latitude: position.latitude,
           longitude: position.longitude,
-          city: place.locality ?? place.subAdministrativeArea,
-          country: place.country,
+          city: city,
+          country: country,
           administrativeArea: place.administrativeArea,
         );
       }
     } catch (e) {
-      // If geocoding fails, return location without address
+      // If geocoding fails, return Zamboanga City as fallback
       return LocationData(
-        latitude: position.latitude,
-        longitude: position.longitude,
+        latitude: 6.9214,
+        longitude: 122.0790,
+        city: "Zamboanga City",
+        country: "Philippines",
+        administrativeArea: "Zamboanga Peninsula",
       );
     }
 
+    // If no placemarks found, return Zamboanga City as fallback
     return LocationData(
-      latitude: position.latitude,
-      longitude: position.longitude,
+      latitude: 6.9214,
+      longitude: 122.0790,
+      city: "Zamboanga City",
+      country: "Philippines",
+      administrativeArea: "Zamboanga Peninsula",
     );
   }
 
@@ -101,19 +122,35 @@ class LocationService {
             
             if (placemarks.isNotEmpty) {
               Placemark place = placemarks.first;
+              String? city = place.locality ?? place.subAdministrativeArea;
+              
+              // If city is null or empty, use Zamboanga City as fallback
+              if (city == null || city.isEmpty) {
+                return LocationData(
+                  latitude: 6.9214,
+                  longitude: 122.0790,
+                  city: "Zamboanga City",
+                  country: "Philippines",
+                  administrativeArea: "Zamboanga Peninsula",
+                );
+              }
+              
               return LocationData(
                 latitude: lastPosition.latitude,
                 longitude: lastPosition.longitude,
-                city: place.locality ?? place.subAdministrativeArea,
+                city: city,
                 country: place.country,
                 administrativeArea: place.administrativeArea,
               );
             }
           } catch (e) {
-            // Geocoding failed, return without address
+            // Geocoding failed, return Zamboanga City as fallback
             return LocationData(
-              latitude: lastPosition.latitude,
-              longitude: lastPosition.longitude,
+              latitude: 6.9214,
+              longitude: 122.0790,
+              city: "Zamboanga City",
+              country: "Philippines",
+              administrativeArea: "Zamboanga Peninsula",
             );
           }
         }

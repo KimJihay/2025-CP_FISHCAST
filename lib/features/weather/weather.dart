@@ -27,6 +27,15 @@ class _WeatherPageState extends State<WeatherPage> {
     _loadLocation();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload location when returning to this page
+    if (!_isLoadingLocation && _sharedLocation?.city == "Zamboanga City") {
+      _loadLocation();
+    }
+  }
+
   Future<void> _loadLocation() async {
     try {
       final location = await _locationService.getLocationWithCache()
