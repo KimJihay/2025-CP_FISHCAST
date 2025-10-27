@@ -32,6 +32,9 @@ class _DashboardPageState extends State<DashboardPage> {
   List<Map<String, dynamic>> _highestPriceFish = [];
   List<Map<String, dynamic>> _lowestPriceFish = [];
   bool _isLoadingPriceLists = true;
+  
+  Map<String, dynamic>? _supplyForecast;
+  bool _isLoadingSupply = false;
 
   @override
   void initState() {
@@ -39,6 +42,8 @@ class _DashboardPageState extends State<DashboardPage> {
     _loadLocation();
     _loadFishTypes();
     _loadPriceLists();
+    // Load initial supply forecast with default fish type
+    _loadSupplyForecast(dropdownValue);
   }
 
   /// Load highest and lowest price fish from forecasts
@@ -183,12 +188,93 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _loadSupplyForecast(String fishName) async {
+    if (mounted) {
+      setState(() {
+        _isLoadingSupply = true;
+        _supplyForecast = null;
+      });
+    }
+
+    try {
+      final apiId = _forecastService.fishNameToApiId(fishName);
+      final supply = await _forecastService.getSupplyForecast(apiId);
+
+      if (mounted) {
+        setState(() {
+          _supplyForecast = supply;
+          _isLoadingSupply = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _supplyForecast = null;
+          _isLoadingSupply = false;
+        });
+      }
+    }
+  }
+
   void _onFishTypeChanged(String? newValue) {
-    if (newValue != null) {
+    if (newValue != null && newValue != dropdownValue) {
       setState(() {
         dropdownValue = newValue;
       });
+      // Load supply forecast for selected fish
+      _loadSupplyForecast(newValue);
     }
+  }
+
+  Widget _buildSupplyChart() {
+    final forecastList = _supplyForecast!['forecast'] as List<dynamic>;
+
+    // Create date labels
+    final dateLabels = forecastList.map((point) {
+      final date = DateTime.parse(point['date'] as String);
+      final weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+          [date.weekday % 7];
+      return '$weekday ${date.day}';
+    }).toList();
+
+    // Create chart data points
+    final supplyPoints = List.generate(forecastList.length, (index) {
+      final supply = (forecastList[index]['supply_kg'] as num).toDouble();
+      return ChartDataPoint(
+        x: index.toDouble(),
+        y: supply,
+        label: dateLabels[index],
+      );
+    });
+
+    // Calculate y-axis range
+    final supplies =
+        forecastList.map((p) => (p['supply_kg'] as num).toDouble()).toList();
+    final minSupply = supplies.reduce((a, b) => a < b ? a : b);
+    final maxSupply = supplies.reduce((a, b) => a > b ? a : b);
+    final range = maxSupply - minSupply;
+    final yMin =
+        (minSupply - range * 0.1).clamp(0, double.infinity).toDouble();
+    final yMax = (maxSupply + range * 0.1).toDouble();
+
+    return LinechartWidget(
+      data: supplyPoints,
+      lineConfig: const LineConfig(
+        color: Colors.blue,
+        label: 'Supply (Kg)',
+        lineWidth: 3.0,
+        showDots: true,
+        showArea: true,
+      ),
+      axisConfig: AxisConfig(
+        customLabels: dateLabels,
+        minX: 0,
+        maxX: (forecastList.length - 1).toDouble(),
+        minY: yMin,
+        maxY: yMax,
+        interval: range > 10000 ? 5000 : 2000,
+      ),
+    );
   }
 
   @override
@@ -437,11 +523,33 @@ class _DashboardPageState extends State<DashboardPage> {
                         ],
                       ),
                       SizedBox(height: 14),
-                      SizedBox(
-                        height: chartHeight,
-                        width: double.infinity,
-                        child: LinechartWidget(data: pricePoints),
-                      ),
+                      if (_isLoadingSupply)
+                        SizedBox(
+                          height: chartHeight,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: kSecondaryColor,
+                            ),
+                          ),
+                        )
+                      else if (_supplyForecast == null ||
+                          (_supplyForecast!['forecast'] as List?)?.isEmpty ==
+                              true)
+                        SizedBox(
+                          height: chartHeight,
+                          child: Center(
+                            child: Text(
+                              'No supply data available',
+                              style: TextStyle(color: kSecondaryTextColor),
+                            ),
+                          ),
+                        )
+                      else
+                        SizedBox(
+                          height: chartHeight,
+                          width: double.infinity,
+                          child: _buildSupplyChart(),
+                        ),
                     ],
                   ),
                 ),

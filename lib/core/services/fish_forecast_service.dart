@@ -211,6 +211,59 @@ class FishForecastService {
     }
   }
 
+  /// Get supply volume forecast for a specific fish type
+  Future<Map<String, dynamic>?> getSupplyForecast(String fishType, {bool forceRefresh = false}) async {
+    final cacheKey = 'supply_$fishType';
+
+    // Try to get from cache first
+    if (!forceRefresh) {
+      final cachedData = await _cacheService.getCache(cacheKey);
+      if (cachedData != null) {
+        try {
+          return cachedData as Map<String, dynamic>;
+        } catch (e) {
+          // Continue to fetch from API if cache parsing fails
+        }
+      }
+    }
+
+    try {
+      final url = Uri.parse('$_baseUrl/supply/$fishType');
+      
+      final response = await http.get(url).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception('Request timeout - backend might be starting up (cold start)');
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        
+        // Cache the response
+        await _cacheService.saveCache(cacheKey, data, _cacheExpiration);
+        
+        return data;
+      } else if (response.statusCode == 404) {
+        return null;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      // Try to return cached data even if expired
+      final cachedData = await _cacheService.getCache(cacheKey);
+      if (cachedData != null) {
+        try {
+          return cachedData as Map<String, dynamic>?;
+        } catch (cacheError) {
+          // Failed to parse cached data
+        }
+      }
+      
+      return null;
+    }
+  }
+
   /// Clear all forecast caches
   Future<void> clearCache() async {
     await _cacheService.clearCache(_allForecastsCacheKey);
