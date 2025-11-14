@@ -5,6 +5,7 @@ import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
 import 'package:fishcast/core/services/fish_type_service.dart';
 import 'package:fishcast/core/services/fish_forecast_service.dart';
 import 'package:fishcast/core/models/fish_forecast_model.dart';
+import 'package:fishcast/features/forecast/seasonal_analysis_page.dart';
 import 'package:flutter/material.dart';
 
 class ForecastPage extends StatefulWidget {
@@ -303,6 +304,19 @@ class _ForecastPageState extends State<ForecastPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(title: const AppbarWidget()),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SeasonalAnalysisPage(),
+              ),
+            );
+          },
+          backgroundColor: kSecondaryColor,
+          icon: const Icon(Icons.insights),
+          label: const Text('Seasonal Trends'),
+        ),
         body: LayoutBuilder(
           builder: (context, constraints) {
             final screenHeight = constraints.maxHeight;
