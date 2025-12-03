@@ -38,14 +38,16 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
     }
   }
 
-  Future<void> _loadOverallSeasonalData() async {
+  Future<void> _loadOverallSeasonalData({bool forceRefresh = false}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final data = await _seasonalService.getSeasonalAnalysis();
+      final data = await _seasonalService.getSeasonalAnalysis(
+        forceRefresh: forceRefresh,
+      );
       
       if (mounted) {
         setState(() {
@@ -66,7 +68,7 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
     }
   }
 
-  Future<void> _loadFishSeasonalData() async {
+  Future<void> _loadFishSeasonalData({bool forceRefresh = false}) async {
     if (_selectedFish == null) return;
 
     setState(() {
@@ -76,7 +78,10 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
 
     try {
       final fishKey = _seasonalService.displayNameToApiId(_selectedFish!);
-      final data = await _seasonalService.getFishSeasonalAnalysis(fishKey);
+      final data = await _seasonalService.getFishSeasonalAnalysis(
+        fishKey,
+        forceRefresh: forceRefresh,
+      );
       
       if (mounted) {
         setState(() {
@@ -132,9 +137,9 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
             ElevatedButton(
               onPressed: () {
                 if (_showOverall) {
-                  _loadOverallSeasonalData();
+                  _loadOverallSeasonalData(forceRefresh: true);
                 } else {
-                  _loadFishSeasonalData();
+                  _loadFishSeasonalData(forceRefresh: true);
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -150,14 +155,11 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
   }
 
   Widget _buildOverallView() {
-    print('Building overall view...');
     if (_seasonalData == null) {
-      print('Seasonal data is null!');
       return const SizedBox.shrink();
     }
 
     final overall = _seasonalData!.overall;
-    print('Monthly data count: ${overall.monthlyData.length}');
     if (overall.monthlyData.isEmpty) {
       return const Center(
         child: Padding(
@@ -188,34 +190,32 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
       yValues: priceValues,
       labels: monthLabels,
     );
-    print('Price data created: ${priceData.length} points');
 
     final supplyData = createChartData(
       yValues: supplyValues,
       labels: monthLabels,
     );
-    print('Supply data created: ${supplyData.length} points');
 
     // Compute y-axis ranges for better chart stability
-    double _computeMin(List<double> values) =>
+    double computeMin(List<double> values) =>
         values.reduce((a, b) => a < b ? a : b);
-    double _computeMax(List<double> values) =>
+    double computeMax(List<double> values) =>
         values.reduce((a, b) => a > b ? a : b);
 
-    final minPrice = _computeMin(priceValues);
-    final maxPrice = _computeMax(priceValues);
+    final minPrice = computeMin(priceValues);
+    final maxPrice = computeMax(priceValues);
     final priceRange = (maxPrice - minPrice).abs();
     final priceMinY = (minPrice - priceRange * 0.1).clamp(0, double.infinity);
     final priceMaxY = maxPrice + priceRange * 0.1;
 
-    final minSupply = _computeMin(supplyValues);
-    final maxSupply = _computeMax(supplyValues);
+    final minSupply = computeMin(supplyValues);
+    final maxSupply = computeMax(supplyValues);
     final supplyRange = (maxSupply - minSupply).abs();
     final supplyMinY = (minSupply - supplyRange * 0.1).clamp(0, double.infinity);
     final supplyMaxY = maxSupply + supplyRange * 0.1;
 
     return RefreshIndicator(
-      onRefresh: _loadOverallSeasonalData,
+      onRefresh: () => _loadOverallSeasonalData(forceRefresh: true),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
@@ -347,19 +347,19 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
 
     // Compute combined y-axis range for dual chart
     final allValues = [...priceValues, ...supplyValues];
-    double _computeMin(List<double> values) =>
+    double computeMin(List<double> values) =>
         values.reduce((a, b) => a < b ? a : b);
-    double _computeMax(List<double> values) =>
+    double computeMax(List<double> values) =>
         values.reduce((a, b) => a > b ? a : b);
 
-    final minY = _computeMin(allValues);
-    final maxY = _computeMax(allValues);
+    final minY = computeMin(allValues);
+    final maxY = computeMax(allValues);
     final range = (maxY - minY).abs();
     final minChartY = (minY - range * 0.1).clamp(0, double.infinity);
     final maxChartY = maxY + range * 0.1;
 
     return RefreshIndicator(
-      onRefresh: _loadFishSeasonalData,
+      onRefresh: () => _loadFishSeasonalData(forceRefresh: true),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
@@ -459,7 +459,7 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: kPrimaryColor.withOpacity(0.1),
+                color: kPrimaryColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.insights, color: kPrimaryColor, size: 32),
@@ -674,7 +674,7 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                             decoration: BoxDecoration(
-                              color: priceColor.withOpacity(0.1),
+                              color: priceColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: priceColor, width: 1),
                             ),

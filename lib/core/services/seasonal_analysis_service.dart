@@ -1,22 +1,33 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
 import 'package:fishcast/core/models/seasonal_analysis_model.dart';
 import 'package:fishcast/core/services/cache_service.dart';
+import 'package:fishcast/core/utils/constants.dart';
+
+void _logSeasonal(String message) {
+  developer.log(message, name: 'SeasonalAnalysisService');
+}
 
 class SeasonalAnalysisService {
   // Singleton pattern
-  static final SeasonalAnalysisService _instance = SeasonalAnalysisService._internal();
+  static final SeasonalAnalysisService _instance =
+      SeasonalAnalysisService._internal();
   factory SeasonalAnalysisService() => _instance;
   SeasonalAnalysisService._internal();
 
   // Backend API URL
-  static const String _baseUrl = 'https://fishcast-backend-coq5.onrender.com';
-  
+  static const String _baseUrl = kBaseUrl;
+
   final CacheService _cacheService = CacheService();
-  static const Duration _cacheValidity = Duration(hours: 24); // Cache for 24 hours
+  static const Duration _cacheValidity = Duration(
+    hours: 24,
+  ); // Cache for 24 hours
 
   /// Get overall seasonal analysis for all fish
-  Future<SeasonalAnalysis?> getSeasonalAnalysis({bool forceRefresh = false}) async {
+  Future<SeasonalAnalysis?> getSeasonalAnalysis({
+    bool forceRefresh = false,
+  }) async {
     const cacheKey = 'seasonal_analysis_all';
 
     // Try to get from cache first
@@ -24,33 +35,33 @@ class SeasonalAnalysisService {
       final cachedData = await _cacheService.getCache(cacheKey, _cacheValidity);
       if (cachedData != null) {
         try {
-          return SeasonalAnalysis.fromJson(cachedData as Map<String, dynamic>);
+          return SeasonalAnalysis.fromJson(cachedData);
         } catch (e) {
-          print('Error parsing cached seasonal analysis: $e');
+          _logSeasonal('Error parsing cached seasonal analysis: $e');
         }
       }
     }
 
     // Fetch from API
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/seasonal'),
-      ).timeout(const Duration(seconds: 30));
+      final response = await http
+          .get(Uri.parse('$_baseUrl/seasonal'))
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
-        
+
         // Cache the response
-        await _cacheService.saveCache(cacheKey, jsonData);
-        
+        await _cacheService.saveCache(cacheKey, jsonData, _cacheValidity);
+
         return SeasonalAnalysis.fromJson(jsonData);
       } else {
-        print('Failed to load seasonal analysis: ${response.statusCode}');
-        print('Response: ${response.body}');
+        _logSeasonal('Failed to load seasonal analysis: ${response.statusCode}');
+        _logSeasonal('Response: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error fetching seasonal analysis: $e');
+      _logSeasonal('Error fetching seasonal analysis: $e');
       return null;
     }
   }
@@ -67,33 +78,33 @@ class SeasonalAnalysisService {
       final cachedData = await _cacheService.getCache(cacheKey, _cacheValidity);
       if (cachedData != null) {
         try {
-          return FishSeasonalData.fromJson(cachedData as Map<String, dynamic>);
+          return FishSeasonalData.fromJson(cachedData);
         } catch (e) {
-          print('Error parsing cached fish seasonal analysis: $e');
+          _logSeasonal('Error parsing cached fish seasonal analysis: $e');
         }
       }
     }
 
     // Fetch from API
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/seasonal/$fishType'),
-      ).timeout(const Duration(seconds: 30));
+      final response = await http
+          .get(Uri.parse('$_baseUrl/seasonal/$fishType'))
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
-        
+
         // Cache the response
-        await _cacheService.saveCache(cacheKey, jsonData);
-        
+        await _cacheService.saveCache(cacheKey, jsonData, _cacheValidity);
+
         return FishSeasonalData.fromJson(jsonData);
       } else {
-        print('Failed to load fish seasonal analysis: ${response.statusCode}');
-        print('Response: ${response.body}');
+        _logSeasonal('Failed to load fish seasonal analysis: ${response.statusCode}');
+        _logSeasonal('Response: ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error fetching fish seasonal analysis: $e');
+      _logSeasonal('Error fetching fish seasonal analysis: $e');
       return null;
     }
   }
@@ -113,7 +124,9 @@ class SeasonalAnalysisService {
   String apiIdToDisplayName(String apiId) {
     // This is a simplified version - you might want to use FishTypeService for accurate mapping
     final words = apiId.split('_');
-    return words.map((word) => word[0].toUpperCase() + word.substring(1)).join(' ');
+    return words
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
   }
 
   /// Clear cached seasonal data
