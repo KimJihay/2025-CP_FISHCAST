@@ -342,21 +342,41 @@ class _ForecastPageState extends State<ForecastPage> {
                   ],
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  "Price Forecast",
-                  style: TextStyle(
-                    color: kForegroundColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Urbanist',
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      "Price Forecast",
+                      style: TextStyle(
+                        color: kForegroundColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Urbanist',
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.orange[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "Predicted",
+                        style: TextStyle(
+                          color: Colors.orange[800],
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "Next 7d",
+                      "Next 7 days",
                       style: TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                     const SizedBox(width: 8),
@@ -419,14 +439,34 @@ class _ForecastPageState extends State<ForecastPage> {
                   child: _buildForecastChart(),
                 ),
                 SizedBox(height: 15),
-                Text(
-                  "Fish by Price",
-                  style: TextStyle(
-                    color: kForegroundColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Urbanist',
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      "Fish by Predicted Price",
+                      style: TextStyle(
+                        color: kForegroundColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Urbanist',
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.orange[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "Forecast",
+                        style: TextStyle(
+                          color: Colors.orange[800],
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 16),
                 if (_isLoadingTopFish)

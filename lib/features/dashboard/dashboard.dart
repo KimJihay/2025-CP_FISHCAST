@@ -32,9 +32,11 @@ class _DashboardPageState extends State<DashboardPage> {
   List<Map<String, dynamic>> _highestPriceFish = [];
   List<Map<String, dynamic>> _lowestPriceFish = [];
   bool _isLoadingPriceLists = true;
+  String? _priceDate;
   
   Map<String, dynamic>? _supplyForecast;
   bool _isLoadingSupply = false;
+  bool _isQuarterlyView = false;
 
   @override
   void initState() {
@@ -46,7 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _loadSupplyForecast(dropdownValue);
   }
 
-  /// Load highest and lowest price fish from forecasts
+  /// Load highest and lowest price fish from actual/current prices
   Future<void> _loadPriceLists() async {
     if (mounted) {
       setState(() {
@@ -55,9 +57,9 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     try {
-      final allForecasts = await _forecastService.getAllForecasts();
+      final currentPrices = await _forecastService.getCurrentPrices();
 
-      if (allForecasts == null || allForecasts.isEmpty) {
+      if (currentPrices == null || currentPrices['prices'] == null) {
         if (mounted) {
           setState(() {
             _highestPriceFish = [];
@@ -68,35 +70,27 @@ class _DashboardPageState extends State<DashboardPage> {
         return;
       }
 
-      // Build list of fish with their prices
+      final pricesData = currentPrices['prices'] as Map<String, dynamic>;
+      final priceDate = currentPrices['date'] as String?;
+
+      // Build list of fish with their actual prices
       final fishPriceList = <Map<String, dynamic>>[];
 
-      for (final entry in allForecasts.entries) {
-        final fishType = entry.key;
-        final forecast = entry.value;
+      for (final entry in pricesData.entries) {
+        final fishKey = entry.key;
+        final fishData = entry.value as Map<String, dynamic>;
 
-        if (forecast.forecast.isNotEmpty) {
-          final latestPrice = forecast.forecast.last.price;
-          final previousPrice = forecast.forecast.length > 1
-              ? forecast.forecast[forecast.forecast.length - 2].price
-              : latestPrice;
+        final price = (fishData['price'] as num).toDouble();
+        final fishName = fishData['fish_name'] as String? ??
+            _forecastService.apiIdToDisplayName(fishKey);
 
-          final changePercentage = previousPrice != 0
-              ? ((latestPrice - previousPrice) / previousPrice) * 100
-              : 0.0;
-
-          final displayName =
-              _forecastService.apiIdToDisplayName(fishType);
-
-          // Filter out invalid entries: skip if price is 0 or negative, or name is empty
-          if (latestPrice > 0 && displayName.isNotEmpty) {
-            fishPriceList.add({
-              'fishName': displayName,
-              'price': latestPrice,
-              'changePercentage': changePercentage,
-              'fishType': fishType,
-            });
-          }
+        // Filter out invalid entries
+        if (price > 0 && fishName.isNotEmpty) {
+          fishPriceList.add({
+            'fishName': fishName,
+            'price': price,
+            'fishType': fishKey,
+          });
         }
       }
 
@@ -112,6 +106,7 @@ class _DashboardPageState extends State<DashboardPage> {
         setState(() {
           _highestPriceFish = highest.take(5).toList();
           _lowestPriceFish = lowest.take(5).toList();
+          _priceDate = priceDate;
           _isLoadingPriceLists = false;
         });
       }
@@ -191,7 +186,7 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
-  Future<void> _loadSupplyForecast(String fishName) async {
+  Future<void> _loadSupplyForecast(String fishName, {bool quarterly = false}) async {
     if (mounted) {
       setState(() {
         _isLoadingSupply = true;
@@ -201,7 +196,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
     try {
       final apiId = _forecastService.fishNameToApiId(fishName);
-      final supply = await _forecastService.getSupplyForecast(apiId);
+      final supply = quarterly
+          ? await _forecastService.getQuarterlySupplyForecast(apiId)
+          : await _forecastService.getSupplyForecast(apiId);
 
       if (mounted) {
         setState(() {
@@ -225,34 +222,79 @@ class _DashboardPageState extends State<DashboardPage> {
         dropdownValue = newValue;
       });
       // Load supply forecast for selected fish
-      _loadSupplyForecast(newValue);
+      _loadSupplyForecast(newValue, quarterly: _isQuarterlyView);
+    }
+  }
+
+  void _onSupplyViewToggle(bool isQuarterly) {
+    if (isQuarterly != _isQuarterlyView) {
+      setState(() {
+        _isQuarterlyView = isQuarterly;
+      });
+      _loadSupplyForecast(dropdownValue, quarterly: isQuarterly);
     }
   }
 
   Widget _buildSupplyChart() {
     final forecastList = _supplyForecast!['forecast'] as List<dynamic>;
 
-    // Create date labels
-    final dateLabels = forecastList.map((point) {
-      final date = DateTime.parse(point['date'] as String);
-      final weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-          [date.weekday % 7];
-      return '$weekday ${date.day}';
-    }).toList();
+    List<String> dateLabels;
+    List<ChartDataPoint> supplyPoints;
+    List<double> supplies;
 
-    // Create chart data points
-    final supplyPoints = List.generate(forecastList.length, (index) {
-      final supply = (forecastList[index]['supply_kg'] as num).toDouble();
-      return ChartDataPoint(
-        x: index.toDouble(),
-        y: supply,
-        label: dateLabels[index],
-      );
-    });
+    if (_isQuarterlyView && forecastList.length > 14) {
+      // For quarterly view, aggregate by week for readability
+      final weeklyData = <Map<String, dynamic>>[];
+      for (int i = 0; i < forecastList.length; i += 7) {
+        final weekEnd = (i + 7 < forecastList.length) ? i + 7 : forecastList.length;
+        final weekItems = forecastList.sublist(i, weekEnd);
+        final avgSupply = weekItems
+            .map((p) => (p['supply_kg'] as num).toDouble())
+            .reduce((a, b) => a + b) / weekItems.length;
+        final startDate = DateTime.parse(weekItems.first['date'] as String);
+        weeklyData.add({
+          'date': startDate,
+          'supply_kg': avgSupply,
+        });
+      }
+
+      dateLabels = weeklyData.map((point) {
+        final date = point['date'] as DateTime;
+        return '${date.month}/${date.day}';
+      }).toList();
+
+      supplyPoints = List.generate(weeklyData.length, (index) {
+        final supply = (weeklyData[index]['supply_kg'] as num).toDouble();
+        return ChartDataPoint(
+          x: index.toDouble(),
+          y: supply,
+          label: dateLabels[index],
+        );
+      });
+
+      supplies = weeklyData.map((p) => (p['supply_kg'] as num).toDouble()).toList();
+    } else {
+      // For 7-day view, show daily data
+      dateLabels = forecastList.map((point) {
+        final date = DateTime.parse(point['date'] as String);
+        final weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+            [date.weekday % 7];
+        return '$weekday ${date.day}';
+      }).toList();
+
+      supplyPoints = List.generate(forecastList.length, (index) {
+        final supply = (forecastList[index]['supply_kg'] as num).toDouble();
+        return ChartDataPoint(
+          x: index.toDouble(),
+          y: supply,
+          label: dateLabels[index],
+        );
+      });
+
+      supplies = forecastList.map((p) => (p['supply_kg'] as num).toDouble()).toList();
+    }
 
     // Calculate y-axis range
-    final supplies =
-        forecastList.map((p) => (p['supply_kg'] as num).toDouble()).toList();
     final minSupply = supplies.reduce((a, b) => a < b ? a : b);
     final maxSupply = supplies.reduce((a, b) => a > b ? a : b);
     final range = maxSupply - minSupply;
@@ -272,7 +314,7 @@ class _DashboardPageState extends State<DashboardPage> {
       axisConfig: AxisConfig(
         customLabels: dateLabels,
         minX: 0,
-        maxX: (forecastList.length - 1).toDouble(),
+        maxX: (supplyPoints.length - 1).toDouble(),
         minY: yMin,
         maxY: yMax,
         interval: range > 10000 ? 5000 : 2000,
@@ -303,16 +345,34 @@ class _DashboardPageState extends State<DashboardPage> {
                       const SizedBox(height: 5),
                       MoonPhasesCard(location: _sharedLocation!),
                       SizedBox(height: 20),
-                      Text(
-                        "Highest Price Fish (per kg)",
-                        style: TextStyle(
-                          color: kForegroundColor,
-                          fontSize: titleFontSize,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Urbanist',
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Highest Price Fish (per kg)",
+                            style: TextStyle(
+                              color: kForegroundColor,
+                              fontSize: titleFontSize,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Urbanist',
+                            ),
+                          ),
+                          if (_priceDate != null)
+                            Text(
+                              "as of $_priceDate",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 11,
+                              ),
+                            ),
+                        ],
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 4),
+                      Text(
+                        "Current Market Prices",
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      SizedBox(height: 16),
                       if (_isLoadingPriceLists)
                         Center(
                           child: CircularProgressIndicator(color: kSecondaryColor),
@@ -327,8 +387,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       else
                         ...List.generate(_highestPriceFish.length, (index) {
                           final fishData = _highestPriceFish[index];
-                          final changePercentage =
-                              fishData['changePercentage'] as double;
                           final price = fishData['price'] as double;
                           final fishName = fishData['fishName'] as String;
 
@@ -346,16 +404,14 @@ class _DashboardPageState extends State<DashboardPage> {
                                     ),
                                   ),
                                   SizedBox(width: 8),
-                                  Text("₱${price.toStringAsFixed(2)}")
+                                  Text(
+                                    "₱${price.toStringAsFixed(2)}",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: kForegroundColor,
+                                    ),
+                                  )
                                 ],
-                              ),
-                              trailing: Text(
-                                "${changePercentage > 0 ? '+' : ''}${changePercentage.toStringAsFixed(1)}%",
-                                style: TextStyle(
-                                  color: changePercentage > 0
-                                      ? Colors.green
-                                      : Colors.red,
-                                ),
                               ),
                             ),
                           ];
@@ -392,7 +448,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           fontFamily: 'Urbanist',
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 16),
                       if (_isLoadingPriceLists)
                         Center(
                           child: CircularProgressIndicator(color: kSecondaryColor),
@@ -407,8 +463,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       else
                         ...List.generate(_lowestPriceFish.length, (index) {
                           final fishData = _lowestPriceFish[index];
-                          final changePercentage =
-                              fishData['changePercentage'] as double;
                           final price = fishData['price'] as double;
                           final fishName = fishData['fishName'] as String;
 
@@ -426,16 +480,14 @@ class _DashboardPageState extends State<DashboardPage> {
                                     ),
                                   ),
                                   SizedBox(width: 8),
-                                  Text("₱${price.toStringAsFixed(2)}")
+                                  Text(
+                                    "₱${price.toStringAsFixed(2)}",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: kForegroundColor,
+                                    ),
+                                  )
                                 ],
-                              ),
-                              trailing: Text(
-                                "${changePercentage > 0 ? '+' : ''}${changePercentage.toStringAsFixed(1)}%",
-                                style: TextStyle(
-                                  color: changePercentage > 0
-                                      ? Colors.green
-                                      : Colors.red,
-                                ),
                               ),
                             ),
                           ];
@@ -475,9 +527,46 @@ class _DashboardPageState extends State<DashboardPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            "Next 7d",
-                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () => _onSupplyViewToggle(false),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: !_isQuarterlyView ? kSecondaryColor : Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    "7 Days",
+                                    style: TextStyle(
+                                      color: !_isQuarterlyView ? Colors.white : Colors.grey[600],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () => _onSupplyViewToggle(true),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: _isQuarterlyView ? kSecondaryColor : Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    "Quarterly",
+                                    style: TextStyle(
+                                      color: _isQuarterlyView ? Colors.white : Colors.grey[600],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(width: 8),
                           Flexible(

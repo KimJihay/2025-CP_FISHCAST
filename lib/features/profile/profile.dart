@@ -619,8 +619,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildDivider(),
                         _buildListTile(
                           icon: Icons.location_on,
-                          text: 'Enable Location',
-                          onTap: _handleLocationPermission,
+                          text: _locationTileLabel(),
+                          onTap: () {
+                            if (_isCheckingLocation) return;
+                            _handleLocationPermission();
+                          },
                         ),
                         _buildDivider(),
                         _buildListTile(
@@ -777,5 +780,29 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Icon(Icons.person, size: iconSize, color: Colors.blue),
       );
     }
+  }
+
+  String _locationTileLabel() {
+    if (_isCheckingLocation) {
+      return 'Checking Location...';
+    }
+
+    if (_locationPermission == null) {
+      return 'Enable Location';
+    }
+
+    return 'Location: ${_formatPermissionLabel(_locationPermission!)}';
+  }
+
+  String _formatPermissionLabel(LocationPermission permission) {
+    final cleaned = permission.name.replaceAll('_', ' ');
+    return cleaned
+        .split(' ')
+        .map(
+          (word) => word.isEmpty
+              ? ''
+              : word[0].toUpperCase() + word.substring(1).toLowerCase(),
+        )
+        .join(' ');
   }
 }

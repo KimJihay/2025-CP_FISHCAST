@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:fishcast/core/models/fish_type_model.dart';
 
 /// Service for managing fish types
@@ -66,7 +68,7 @@ class FishTypeService {
       
     } catch (e) {
       // If API fails, return default fish types
-      print('Error fetching fish types: $e');
+      developer.log('Error fetching fish types: $e', name: 'FishTypeService');
       return _defaultFishTypes;
     }
   }
