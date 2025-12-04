@@ -249,7 +249,7 @@ class FishForecastService {
         try {
           return cachedData;
         } catch (e) {
-          // Continue to fetch from API if cache parsing fails
+          _log('Cache parse error for supply $fishType: $e');
         }
       }
     }
@@ -281,13 +281,15 @@ class FishForecastService {
         return null;
       }
     } catch (e) {
+      _log('Error fetching supply forecast for $fishType: $e');
       // Try to return cached data even if expired
       final cachedData = await _cacheService.getCache(cacheKey);
       if (cachedData != null) {
         try {
+          _log('Using expired cache data for supply $fishType');
           return cachedData;
         } catch (cacheError) {
-          // Failed to parse cached data
+          _log('Failed to parse cached supply data: $cacheError');
         }
       }
 
@@ -315,7 +317,7 @@ class FishForecastService {
         try {
           return cachedData;
         } catch (e) {
-          // Continue to fetch from API if cache parsing fails
+          _log('Cache parse error for current prices: $e');
         }
       }
     }
@@ -342,16 +344,19 @@ class FishForecastService {
 
         return data;
       } else {
+        _log('API error for current prices: ${response.statusCode}');
         return null;
       }
     } catch (e) {
+      _log('Error fetching current prices: $e');
       // Try to return cached data even if expired
       final cachedData = await _cacheService.getCache(cacheKey);
       if (cachedData != null) {
         try {
+          _log('Using expired cache data for current prices');
           return cachedData;
         } catch (cacheError) {
-          // Failed to parse cached data
+          _log('Failed to parse cached current prices: $cacheError');
         }
       }
 
@@ -373,7 +378,7 @@ class FishForecastService {
         try {
           return cachedData;
         } catch (e) {
-          // Continue to fetch from API if cache parsing fails
+          _log('Cache parse error for quarterly supply $fishType: $e');
         }
       }
     }
@@ -400,18 +405,22 @@ class FishForecastService {
 
         return data;
       } else if (response.statusCode == 404) {
+        _log('Quarterly supply not found for $fishType');
         return null;
       } else {
+        _log('API error for quarterly supply $fishType: ${response.statusCode}');
         return null;
       }
     } catch (e) {
+      _log('Error fetching quarterly supply for $fishType: $e');
       // Try to return cached data even if expired
       final cachedData = await _cacheService.getCache(cacheKey);
       if (cachedData != null) {
         try {
+          _log('Using expired cache data for quarterly supply $fishType');
           return cachedData;
         } catch (cacheError) {
-          // Failed to parse cached data
+          _log('Failed to parse cached quarterly supply: $cacheError');
         }
       }
 

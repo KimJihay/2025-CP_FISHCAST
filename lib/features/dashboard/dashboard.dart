@@ -27,7 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
   
   List<String> fishTypes = [];
   bool _isLoadingFishTypes = true;
-  String dropdownValue = "Galunggong";
+  String dropdownValue = "Galunggong (Round Scad)";
   
   List<Map<String, dynamic>> _highestPriceFish = [];
   List<Map<String, dynamic>> _lowestPriceFish = [];
@@ -421,24 +421,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           return widgets;
                         }).expand((x) => x),
                       SizedBox(height: 27),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // Navigate to forecast page
-                            Navigator.of(context).pushNamed('/forecast');
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text("View More"),
-                              SizedBox(width: 4),
-                              Icon(Icons.arrow_forward, size: 16),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 27),
+                      const SizedBox(height: 27),
                       Text(
                         "Lowest Price Fish (per kg)",
                         style: TextStyle(
@@ -496,24 +479,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           }
                           return widgets;
                         }).expand((x) => x),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            // Navigate to forecast page
-                            Navigator.of(context).pushNamed('/forecast');
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text("View More"),
-                              SizedBox(width: 4),
-                              Icon(Icons.arrow_forward, size: 16),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 27),
+                      const SizedBox(height: 27),
                       Text(
                         "Predict Supply Volume",
                         style: TextStyle(
