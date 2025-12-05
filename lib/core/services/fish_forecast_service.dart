@@ -435,8 +435,7 @@ class FishForecastService {
         .toLowerCase()
         .replaceAll('(', '')
         .replaceAll(')', '')
-        .replaceAll(' ', '_')
-        .replaceAll('-', '_');
+        .replaceAll(' ', '_');
   }
 
   /// Convert API identifier to display name
