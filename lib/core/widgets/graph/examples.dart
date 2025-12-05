@@ -178,10 +178,10 @@ class _DynamicDataChartExampleState extends State<DynamicDataChartExample> {
             ElevatedButton(
               onPressed: () => updateChartData(
                 [15, 25, 20, 30, 35, 32, 40, 45, 42, 50, 48, 55],
-                'Tilapia',
+                'Bangus',
                 Colors.green,
               ),
-              child: Text('Tilapia'),
+              child: Text('Bangus'),
             ),
           ],
         ),
@@ -389,7 +389,7 @@ class _ListConnectedChartExampleState extends State<ListConnectedChartExample> {
   // Your data list (could come from anywhere)
   final List<Map<String, dynamic>> fishData = [
     {'name': 'Galunggong', 'prices': [25.0, 28.0, 30.0, 32.0, 35.0, 38.0, 40.0, 42.0, 45.0, 48.0, 50.0, 52.0]},
-    {'name': 'Tilapia', 'prices': [30.0, 32.0, 35.0, 38.0, 40.0, 42.0, 45.0, 48.0, 50.0, 52.0, 55.0, 58.0]},
+    {'name': 'Bangus', 'prices': [30.0, 32.0, 35.0, 38.0, 40.0, 42.0, 45.0, 48.0, 50.0, 52.0, 55.0, 58.0]},
     {'name': 'Bangus', 'prices': [40.0, 42.0, 45.0, 48.0, 50.0, 52.0, 55.0, 58.0, 60.0, 62.0, 65.0, 68.0]},
   ];
   

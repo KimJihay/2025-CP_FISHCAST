@@ -45,7 +45,9 @@ class _ForecastPageState extends State<ForecastPage> {
     }
 
     try {
-      final allForecasts = await _forecastService.getAllForecasts();
+      final allForecasts = await _forecastService.getAllForecasts(
+        forceRefresh: true,
+      );
 
       if (allForecasts == null || allForecasts.isEmpty) {
         if (mounted) {
@@ -155,7 +157,10 @@ class _ForecastPageState extends State<ForecastPage> {
     try {
       // Convert display name to API identifier
       final apiId = _forecastService.fishNameToApiId(dropdownValue);
-      final forecast = await _forecastService.getForecast(apiId);
+      final forecast = await _forecastService.getForecast(
+        apiId,
+        forceRefresh: true,
+      );
 
       if (mounted) {
         setState(() {
@@ -246,7 +251,10 @@ class _ForecastPageState extends State<ForecastPage> {
     }
 
     // Convert forecast data to chart points
-    final forecastData = _currentForecast!.forecast;
+    final forecastData = List<ForecastDataPoint>.from(
+      _currentForecast!.forecast,
+    )
+      ..sort((a, b) => a.date.compareTo(b.date));
     
     // Create date labels for the forecast (e.g., "Mon 27", "Tue 28")
     final dateLabels = forecastData.map((point) {
@@ -267,9 +275,21 @@ class _ForecastPageState extends State<ForecastPage> {
     final prices = forecastData.map((p) => p.price).toList();
     final minPrice = prices.reduce((a, b) => a < b ? a : b);
     final maxPrice = prices.reduce((a, b) => a > b ? a : b);
-    final priceRange = maxPrice - minPrice;
-    final yMin = (minPrice - priceRange * 0.1).clamp(0, double.infinity).toDouble();
-    final yMax = (maxPrice + priceRange * 0.1).toDouble();
+    final priceRange = (maxPrice - minPrice).abs();
+    final adjustedRange = priceRange > 0
+        ? priceRange
+        : (maxPrice.abs() * 0.05).clamp(1, double.infinity);
+    final yMin = (minPrice - adjustedRange * 0.1)
+        .clamp(0, double.infinity)
+        .toDouble();
+    final yMax = (maxPrice + adjustedRange * 0.1).toDouble();
+    final interval = adjustedRange > 100
+        ? 50
+        : adjustedRange > 20
+            ? 10
+            : adjustedRange > 5
+                ? 2
+                : 1;
     
     return LinechartWidget(
       data: pricePoints,
@@ -286,7 +306,7 @@ class _ForecastPageState extends State<ForecastPage> {
         maxX: (forecastData.length - 1).toDouble(),
         minY: yMin,
         maxY: yMax,
-        interval: priceRange > 100 ? 50 : 20,
+        interval: interval.toDouble(),
         yAxisLabel: 'Price (₱)',
       ),
     );

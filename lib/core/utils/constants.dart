@@ -20,7 +20,17 @@ const kPrimaryStrokeColor = Color(0xFFB5B5B5);
 const kSecondaryStrokeColor = Color(0xFFCFCFCF);
 
 // API Configuration
-// TODO: Replace with your local IP address if running locally (e.g., 'http://192.168.1.5:5000')
-// Make sure your phone and computer are on the same Wi-Fi network
-// For Android Emulator use 'http://10.0.2.2:5000'
-const kBaseUrl = 'https://fishcast-backend-coq5.onrender.com';
+// Network targets
+// - Production (Railway): set FISHCAST_BASE_URL to your deployed URL
+// - Local: pass USE_LOCAL_BACKEND=true and optional FISHCAST_BASE_URL
+const bool kUseLocalBackend = bool.fromEnvironment(
+  'USE_LOCAL_BACKEND',
+  defaultValue: false,
+);
+
+const String kBaseUrl = String.fromEnvironment(
+  'FISHCAST_BASE_URL',
+  defaultValue: kUseLocalBackend
+      ? 'http://10.0.2.2:5000'
+      : 'https://fishcast-api-production.up.railway.app',
+);

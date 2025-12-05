@@ -14,7 +14,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     {
       'icon': Icons.trending_up,
       'title': 'Price Surge Alert',
-      'description': 'Tilapia prices have increased by 15% in the market',
+      'description': 'Bangus prices have increased by 12% in the market',
     },
     {
       'icon': Icons.warning,

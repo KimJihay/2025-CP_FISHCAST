@@ -57,7 +57,9 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     try {
-      final currentPrices = await _forecastService.getCurrentPrices();
+      final currentPrices = await _forecastService.getCurrentPrices(
+        forceRefresh: true,
+      );
 
       if (currentPrices == null || currentPrices['prices'] == null) {
         if (mounted) {
@@ -197,8 +199,14 @@ class _DashboardPageState extends State<DashboardPage> {
     try {
       final apiId = _forecastService.fishNameToApiId(fishName);
       final supply = quarterly
-          ? await _forecastService.getQuarterlySupplyForecast(apiId)
-          : await _forecastService.getSupplyForecast(apiId);
+          ? await _forecastService.getQuarterlySupplyForecast(
+              apiId,
+              forceRefresh: true,
+            )
+          : await _forecastService.getSupplyForecast(
+              apiId,
+              forceRefresh: true,
+            );
 
       if (mounted) {
         setState(() {
