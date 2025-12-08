@@ -32,6 +32,8 @@ class _ForecastPageState extends State<ForecastPage> {
   List<PriceMatch> _matchesByDate = [];
   String? _byDateError;
   DateTime _selectedDate = DateTime.now();
+  DateTime? _minForecastDate;
+  DateTime? _maxForecastDate;
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
@@ -69,12 +71,22 @@ class _ForecastPageState extends State<ForecastPage> {
 
       // Build list of fish with their prices
       final fishPriceList = <Map<String, dynamic>>[];
+      DateTime? minDate;
+      DateTime? maxDate;
 
       for (final entry in allForecasts.entries) {
         final fishType = entry.key; // API identifier like 'galunggong_round_scad'
         final forecast = entry.value;
 
         if (forecast.forecast.isNotEmpty) {
+          for (final point in forecast.forecast) {
+            if (minDate == null || point.date.isBefore(minDate)) {
+              minDate = point.date;
+            }
+            if (maxDate == null || point.date.isAfter(maxDate)) {
+              maxDate = point.date;
+            }
+          }
           // Get the latest price (last date in forecast)
           final latestPrice = forecast.forecast.last.price;
           // Get previous price for percentage change calculation (if available)
@@ -112,6 +124,13 @@ class _ForecastPageState extends State<ForecastPage> {
         setState(() {
           _topFishByPrice = topFive;
           _isLoadingTopFish = false;
+          _minForecastDate = minDate;
+          _maxForecastDate = maxDate;
+          if (minDate != null && maxDate != null) {
+            if (_selectedDate.isBefore(minDate) || _selectedDate.isAfter(maxDate)) {
+              _selectedDate = minDate;
+            }
+          }
         });
       }
     } catch (e) {
@@ -210,8 +229,8 @@ class _ForecastPageState extends State<ForecastPage> {
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(2020, 1, 1),
-      lastDate: DateTime.now(),
+      firstDate: _minForecastDate ?? DateTime.now(),
+      lastDate: _maxForecastDate ?? DateTime.now().add(const Duration(days: 7)),
     );
     if (picked != null) {
       setState(() {
@@ -657,6 +676,12 @@ class _ForecastPageState extends State<ForecastPage> {
                   Text(
                     _byDateError!,
                     style: const TextStyle(color: Colors.red),
+                  ),
+                ] else if (_minForecastDate != null && _maxForecastDate != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'Available forecast dates: ${_dateFormat.format(_minForecastDate ?? DateTime.now())} to ${_dateFormat.format(_maxForecastDate ?? DateTime.now())}',
+                    style: TextStyle(color: kSecondaryTextColor, fontSize: 12),
                   ),
                 ],
                 if (_matchesByDate.isNotEmpty) ...[
