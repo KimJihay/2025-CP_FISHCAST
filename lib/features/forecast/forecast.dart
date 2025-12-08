@@ -251,7 +251,7 @@ class _ForecastPageState extends State<ForecastPage> {
       _byDateError = null;
     });
 
-    final matches = await _forecastService.getPricesByDate(
+    final matches = await _forecastService.getForecastMatchesByDate(
       date: _selectedDate,
       minPrice: minPrice,
       maxPrice: maxPrice,
@@ -554,13 +554,13 @@ class _ForecastPageState extends State<ForecastPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.blue[50],
+                        color: Colors.orange[50],
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        "Actuals",
+                        "Forecast",
                         style: TextStyle(
-                          color: Colors.blue[800],
+                          color: Colors.orange[800],
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                         ),
@@ -569,58 +569,12 @@ class _ForecastPageState extends State<ForecastPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _pickDate,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: kPrimaryStrokeColor),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _dateFormat.format(_selectedDate),
-                                style: TextStyle(color: kForegroundColor),
-                              ),
-                              const Icon(Icons.calendar_today, size: 18),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      width: 90,
-                      child: TextField(
-                        controller: _minPriceController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Min',
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      width: 90,
-                      child: TextField(
-                        controller: _maxPriceController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Max',
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isNarrow = constraints.maxWidth < 500;
+                    final fieldWidth = isNarrow ? (constraints.maxWidth - 16) / 2.2 : 100.0;
+                    final dateWidth = isNarrow ? constraints.maxWidth : 190.0;
+                    final button = ElevatedButton(
                       onPressed: _isLoadingByDate ? null : _loadPricesByDate,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: kSecondaryColor,
@@ -634,8 +588,69 @@ class _ForecastPageState extends State<ForecastPage> {
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
                           : const Text('Search'),
-                    ),
-                  ],
+                    );
+
+                    return Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: dateWidth,
+                          child: GestureDetector(
+                            onTap: _pickDate,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: kPrimaryStrokeColor),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _dateFormat.format(_selectedDate),
+                                      style: TextStyle(color: kForegroundColor),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.calendar_today, size: 18),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: fieldWidth,
+                          child: TextField(
+                            controller: _minPriceController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Min',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: fieldWidth,
+                          child: TextField(
+                            controller: _maxPriceController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Max',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        button,
+                      ],
+                    );
+                  },
                 ),
                 if (_byDateError != null) ...[
                   const SizedBox(height: 8),

@@ -235,6 +235,48 @@ class FishForecastService {
     }
   }
 
+  /// Filter forecasts by date and optional price range (uses forecast data, not historical dataset)
+  Future<List<PriceMatch>?> getForecastMatchesByDate({
+    required DateTime date,
+    double? minPrice,
+    double? maxPrice,
+  }) async {
+    try {
+      final all = await getAllForecasts(forceRefresh: true);
+      if (all == null || all.isEmpty) return null;
+
+      final targetDateStr = DateFormat('yyyy-MM-dd').format(date);
+      final matches = <PriceMatch>[];
+
+      all.forEach((apiId, forecast) {
+        for (final point in forecast.forecast) {
+          final pointDateStr = DateFormat('yyyy-MM-dd').format(point.date);
+          if (pointDateStr != targetDateStr) continue;
+
+          final price = point.price;
+          if (minPrice != null && price < minPrice) continue;
+          if (maxPrice != null && price > maxPrice) continue;
+
+          matches.add(
+            PriceMatch(
+              fishKey: apiId,
+              fishName: apiIdToDisplayName(apiId),
+              price: price,
+              supplyKg: 0,
+            ),
+          );
+        }
+      });
+
+      // Sort by price asc for convenience
+      matches.sort((a, b) => a.price.compareTo(b.price));
+      return matches;
+    } catch (e) {
+      _log('Error filtering forecast matches by date: $e');
+      return null;
+    }
+  }
+
   /// Check if the backend API is healthy
   Future<bool> isApiHealthy() async {
     try {
