@@ -31,9 +31,6 @@ class _ForecastPageState extends State<ForecastPage> {
   List<Map<String, dynamic>> _topFishByPrice = [];
   List<PriceMatch> _matchesByDate = [];
   String? _byDateError;
-  DateTime _selectedDate = DateTime.now();
-  DateTime? _minForecastDate;
-  DateTime? _maxForecastDate;
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
@@ -71,22 +68,12 @@ class _ForecastPageState extends State<ForecastPage> {
 
       // Build list of fish with their prices
       final fishPriceList = <Map<String, dynamic>>[];
-      DateTime? minDate;
-      DateTime? maxDate;
 
       for (final entry in allForecasts.entries) {
         final fishType = entry.key; // API identifier like 'galunggong_round_scad'
         final forecast = entry.value;
 
         if (forecast.forecast.isNotEmpty) {
-          for (final point in forecast.forecast) {
-            if (minDate == null || point.date.isBefore(minDate)) {
-              minDate = point.date;
-            }
-            if (maxDate == null || point.date.isAfter(maxDate)) {
-              maxDate = point.date;
-            }
-          }
           // Get the latest price (last date in forecast)
           final latestPrice = forecast.forecast.last.price;
           // Get previous price for percentage change calculation (if available)
@@ -124,13 +111,6 @@ class _ForecastPageState extends State<ForecastPage> {
         setState(() {
           _topFishByPrice = topFive;
           _isLoadingTopFish = false;
-          _minForecastDate = minDate;
-          _maxForecastDate = maxDate;
-          if (minDate != null && maxDate != null) {
-            if (_selectedDate.isBefore(minDate) || _selectedDate.isAfter(maxDate)) {
-              _selectedDate = minDate;
-            }
-          }
         });
       }
     } catch (e) {
@@ -225,20 +205,6 @@ class _ForecastPageState extends State<ForecastPage> {
     super.dispose();
   }
 
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: _minForecastDate ?? DateTime.now(),
-      lastDate: _maxForecastDate ?? DateTime.now().add(const Duration(days: 7)),
-    );
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
   Future<void> _loadPricesByDate() async {
     double? minPrice;
     double? maxPrice;
@@ -270,8 +236,7 @@ class _ForecastPageState extends State<ForecastPage> {
       _byDateError = null;
     });
 
-    final matches = await _forecastService.getForecastMatchesByDate(
-      date: _selectedDate,
+    final matches = await _forecastService.getForecastMatchesByPriceRange(
       minPrice: minPrice,
       maxPrice: maxPrice,
     );
@@ -281,7 +246,7 @@ class _ForecastPageState extends State<ForecastPage> {
     setState(() {
       _isLoadingByDate = false;
       if (matches == null || matches.isEmpty) {
-        _byDateError = 'No results for that date/range';
+        _byDateError = 'No results within that price range for the next 7 days';
         _matchesByDate = [];
       } else {
         _matchesByDate = matches;
@@ -557,11 +522,11 @@ class _ForecastPageState extends State<ForecastPage> {
                   child: _buildForecastChart(),
                 ),
                 SizedBox(height: 15),
-                // Price by Date + Range
+                // Price by Range (next 7 days forecasts)
                 Row(
                   children: [
                     Text(
-                      "Find Fish by Price on Date",
+                      "Find Fish by Price",
                       style: TextStyle(
                         color: kForegroundColor,
                         fontSize: 16,
@@ -591,8 +556,7 @@ class _ForecastPageState extends State<ForecastPage> {
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final isNarrow = constraints.maxWidth < 500;
-                    final fieldWidth = isNarrow ? (constraints.maxWidth - 16) / 2.2 : 100.0;
-                    final dateWidth = isNarrow ? constraints.maxWidth : 190.0;
+                    final fieldWidth = isNarrow ? (constraints.maxWidth - 16) / 2.2 : 120.0;
                     final button = ElevatedButton(
                       onPressed: _isLoadingByDate ? null : _loadPricesByDate,
                       style: ElevatedButton.styleFrom(
@@ -614,34 +578,6 @@ class _ForecastPageState extends State<ForecastPage> {
                       runSpacing: 8,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        SizedBox(
-                          width: dateWidth,
-                          child: GestureDetector(
-                            onTap: _pickDate,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: kPrimaryStrokeColor),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      _dateFormat.format(_selectedDate),
-                                      style: TextStyle(color: kForegroundColor),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.calendar_today, size: 18),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                         SizedBox(
                           width: fieldWidth,
                           child: TextField(
@@ -677,17 +613,22 @@ class _ForecastPageState extends State<ForecastPage> {
                     _byDateError!,
                     style: const TextStyle(color: Colors.red),
                   ),
-                ] else if (_minForecastDate != null && _maxForecastDate != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    'Available forecast dates: ${_dateFormat.format(_minForecastDate ?? DateTime.now())} to ${_dateFormat.format(_maxForecastDate ?? DateTime.now())}',
-                    style: TextStyle(color: kSecondaryTextColor, fontSize: 12),
-                  ),
                 ],
+                if (_byDateError == null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      'Searches the next 7 days of forecasts',
+                      style: TextStyle(color: kSecondaryTextColor, fontSize: 12),
+                    ),
+                  ),
                 if (_matchesByDate.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Column(
                     children: _matchesByDate.map((match) {
+                      final dateLabel = match.date != null
+                          ? _dateFormat.format(match.date!)
+                          : 'Within next 7 days';
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(12),
@@ -710,7 +651,7 @@ class _ForecastPageState extends State<ForecastPage> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text('₱${match.price.toStringAsFixed(2)}'),
-                                Text('Supply: ${match.supplyKg.toStringAsFixed(1)} kg',
+                                Text('Date: $dateLabel',
                                     style: const TextStyle(fontSize: 12, color: Colors.grey)),
                               ],
                             ),

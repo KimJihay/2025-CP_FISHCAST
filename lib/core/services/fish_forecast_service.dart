@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:intl/intl.dart';
 import 'package:fishcast/core/models/fish_forecast_model.dart';
 import 'package:fishcast/core/services/cache_service.dart';
 import 'package:fishcast/core/utils/constants.dart';
@@ -201,43 +200,8 @@ class FishForecastService {
     return result;
   }
 
-  /// Get fish by price range for a specific date
-  Future<List<PriceMatch>?> getPricesByDate({
-    required DateTime date,
-    double? minPrice,
-    double? maxPrice,
-  }) async {
-    final df = DateFormat('yyyy-MM-dd');
-    final query = <String, String>{'date': df.format(date)};
-    if (minPrice != null) query['min_price'] = minPrice.toString();
-    if (maxPrice != null) query['max_price'] = maxPrice.toString();
-
-    final url = Uri.parse('$_baseUrl/prices/by-date').replace(queryParameters: query);
-    _log('Fetching prices by date from: $url');
-
-    try {
-      final response = await http.get(url).timeout(const Duration(seconds: 30));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final matches = (data['matches'] as List<dynamic>)
-            .map((e) => PriceMatch.fromJson(e as Map<String, dynamic>))
-            .toList();
-        return matches;
-      }
-
-      // 404 or other: surface as null
-      _log('prices/by-date error: ${response.statusCode} ${response.body}');
-      return null;
-    } catch (e) {
-      _log('Error fetching prices by date: $e');
-      return null;
-    }
-  }
-
-  /// Filter forecasts by date and optional price range (uses forecast data, not historical dataset)
-  Future<List<PriceMatch>?> getForecastMatchesByDate({
-    required DateTime date,
+  /// Filter forecasts by price range over the next 7 days (forecast data only)
+  Future<List<PriceMatch>?> getForecastMatchesByPriceRange({
     double? minPrice,
     double? maxPrice,
   }) async {
@@ -245,14 +209,10 @@ class FishForecastService {
       final all = await getAllForecasts(forceRefresh: true);
       if (all == null || all.isEmpty) return null;
 
-      final targetDateStr = DateFormat('yyyy-MM-dd').format(date);
       final matches = <PriceMatch>[];
 
       all.forEach((apiId, forecast) {
         for (final point in forecast.forecast) {
-          final pointDateStr = DateFormat('yyyy-MM-dd').format(point.date);
-          if (pointDateStr != targetDateStr) continue;
-
           final price = point.price;
           if (minPrice != null && price < minPrice) continue;
           if (maxPrice != null && price > maxPrice) continue;
@@ -263,16 +223,17 @@ class FishForecastService {
               fishName: apiIdToDisplayName(apiId),
               price: price,
               supplyKg: 0,
+              date: point.date,
             ),
           );
+          break; // keep first match per fish
         }
       });
 
-      // Sort by price asc for convenience
       matches.sort((a, b) => a.price.compareTo(b.price));
       return matches;
     } catch (e) {
-      _log('Error filtering forecast matches by date: $e');
+      _log('Error filtering forecast matches by price range: $e');
       return null;
     }
   }
@@ -533,12 +494,14 @@ class PriceMatch {
   final String fishName;
   final double price;
   final double supplyKg;
+  final DateTime? date;
 
   PriceMatch({
     required this.fishKey,
     required this.fishName,
     required this.price,
     required this.supplyKg,
+    this.date,
   });
 
   factory PriceMatch.fromJson(Map<String, dynamic> json) {
