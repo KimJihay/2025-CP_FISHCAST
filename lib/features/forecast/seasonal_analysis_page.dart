@@ -179,6 +179,9 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
       if (name.isNotEmpty) return name;
       return 'M${m.monthNumber}';
     }).toList();
+    while (monthLabels.length < 12) {
+      monthLabels.add('');
+    }
     
     // Prepare chart data
     final priceValues = overall.monthlyData.map((m) => m.avgPrice).toList();
@@ -256,7 +259,7 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
                 axisConfig: AxisConfig(
                   customLabels: monthLabels,
                   minX: 0,
-                  maxX: (monthLabels.length - 1).toDouble(),
+                  maxX: 11,
                   minY: priceMinY.toDouble(),
                   maxY: priceMaxY.toDouble(),
                   interval: priceRange > 0 ? priceRange / 4 : 1,
@@ -274,7 +277,7 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
                 axisConfig: AxisConfig(
                   customLabels: monthLabels,
                   minX: 0,
-                  maxX: (monthLabels.length - 1).toDouble(),
+                  maxX: 11,
                   minY: supplyMinY.toDouble(),
                   maxY: supplyMaxY.toDouble(),
                   interval: supplyRange > 0 ? supplyRange / 4 : 1,
@@ -330,6 +333,9 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
       if (name.isNotEmpty) return name;
       return 'M${m.monthNumber}';
     }).toList();
+    while (monthLabels.length < 12) {
+      monthLabels.add('');
+    }
     
     // Prepare chart data
     final priceValues = fish.monthlyData.map((m) => m.avgPrice).toList();
@@ -433,7 +439,7 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
                 axisConfig: AxisConfig(
                   customLabels: monthLabels,
                   minX: 0,
-                  maxX: (monthLabels.length - 1).toDouble(),
+                  maxX: 11,
                   minY: minChartY.toDouble(),
                   maxY: maxChartY.toDouble(),
                   interval: range > 0 ? range / 4 : 1,

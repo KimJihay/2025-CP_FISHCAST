@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'package:intl/intl.dart';
 import 'package:fishcast/core/models/fish_forecast_model.dart';
 import 'package:fishcast/core/services/cache_service.dart';
 import 'package:fishcast/core/utils/constants.dart';
@@ -198,6 +199,40 @@ class FishForecastService {
     });
 
     return result;
+  }
+
+  /// Get fish by price range for a specific date
+  Future<List<PriceMatch>?> getPricesByDate({
+    required DateTime date,
+    double? minPrice,
+    double? maxPrice,
+  }) async {
+    final df = DateFormat('yyyy-MM-dd');
+    final query = <String, String>{'date': df.format(date)};
+    if (minPrice != null) query['min_price'] = minPrice.toString();
+    if (maxPrice != null) query['max_price'] = maxPrice.toString();
+
+    final url = Uri.parse('$_baseUrl/prices/by-date').replace(queryParameters: query);
+    _log('Fetching prices by date from: $url');
+
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final matches = (data['matches'] as List<dynamic>)
+            .map((e) => PriceMatch.fromJson(e as Map<String, dynamic>))
+            .toList();
+        return matches;
+      }
+
+      // 404 or other: surface as null
+      _log('prices/by-date error: ${response.statusCode} ${response.body}');
+      return null;
+    } catch (e) {
+      _log('Error fetching prices by date: $e');
+      return null;
+    }
   }
 
   /// Check if the backend API is healthy
@@ -448,5 +483,28 @@ class FishForecastService {
               word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1),
         )
         .join(' ');
+  }
+}
+
+class PriceMatch {
+  final String fishKey;
+  final String fishName;
+  final double price;
+  final double supplyKg;
+
+  PriceMatch({
+    required this.fishKey,
+    required this.fishName,
+    required this.price,
+    required this.supplyKg,
+  });
+
+  factory PriceMatch.fromJson(Map<String, dynamic> json) {
+    return PriceMatch(
+      fishKey: json['fish_key'] as String,
+      fishName: json['fish_name'] as String,
+      price: (json['price'] as num).toDouble(),
+      supplyKg: (json['supply_kg'] as num).toDouble(),
+    );
   }
 }

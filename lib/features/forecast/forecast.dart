@@ -7,6 +7,7 @@ import 'package:fishcast/core/services/fish_forecast_service.dart';
 import 'package:fishcast/core/models/fish_forecast_model.dart';
 import 'package:fishcast/features/forecast/seasonal_analysis_page.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ForecastPage extends StatefulWidget {
   const ForecastPage({super.key});
@@ -23,10 +24,17 @@ class _ForecastPageState extends State<ForecastPage> {
   bool _isLoadingFishTypes = true;
   bool _isLoadingForecast = false;
   bool _isLoadingTopFish = true;
+  bool _isLoadingByDate = false;
   String dropdownValue = "Galunggong (Round Scad)";
   FishForecast? _currentForecast;
   String? _errorMessage;
   List<Map<String, dynamic>> _topFishByPrice = [];
+  List<PriceMatch> _matchesByDate = [];
+  String? _byDateError;
+  DateTime _selectedDate = DateTime.now();
+  final TextEditingController _minPriceController = TextEditingController();
+  final TextEditingController _maxPriceController = TextEditingController();
+  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
 
   @override
   void initState() {
@@ -189,6 +197,77 @@ class _ForecastPageState extends State<ForecastPage> {
       // Load new forecast for selected fish
       _loadForecast();
     }
+  }
+
+  @override
+  void dispose() {
+    _minPriceController.dispose();
+    _maxPriceController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020, 1, 1),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _loadPricesByDate() async {
+    double? minPrice;
+    double? maxPrice;
+
+    try {
+      if (_minPriceController.text.trim().isNotEmpty) {
+        minPrice = double.parse(_minPriceController.text.trim());
+      }
+      if (_maxPriceController.text.trim().isNotEmpty) {
+        maxPrice = double.parse(_maxPriceController.text.trim());
+      }
+      if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+        setState(() {
+          _byDateError = 'Min price cannot be greater than max price';
+          _matchesByDate = [];
+        });
+        return;
+      }
+    } catch (_) {
+      setState(() {
+        _byDateError = 'Prices must be numbers';
+        _matchesByDate = [];
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingByDate = true;
+      _byDateError = null;
+    });
+
+    final matches = await _forecastService.getPricesByDate(
+      date: _selectedDate,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingByDate = false;
+      if (matches == null || matches.isEmpty) {
+        _byDateError = 'No results for that date/range';
+        _matchesByDate = [];
+      } else {
+        _matchesByDate = matches;
+      }
+    });
   }
 
   /// Build the forecast chart widget
@@ -459,6 +538,149 @@ class _ForecastPageState extends State<ForecastPage> {
                   child: _buildForecastChart(),
                 ),
                 SizedBox(height: 15),
+                // Price by Date + Range
+                Row(
+                  children: [
+                    Text(
+                      "Find Fish by Price on Date",
+                      style: TextStyle(
+                        color: kForegroundColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Urbanist',
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[50],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "Actuals",
+                        style: TextStyle(
+                          color: Colors.blue[800],
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _pickDate,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: kPrimaryStrokeColor),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _dateFormat.format(_selectedDate),
+                                style: TextStyle(color: kForegroundColor),
+                              ),
+                              const Icon(Icons.calendar_today, size: 18),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 90,
+                      child: TextField(
+                        controller: _minPriceController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Min',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 90,
+                      child: TextField(
+                        controller: _maxPriceController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Max',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _isLoadingByDate ? null : _loadPricesByDate,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kSecondaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      ),
+                      child: _isLoadingByDate
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Text('Search'),
+                    ),
+                  ],
+                ),
+                if (_byDateError != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _byDateError!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ],
+                if (_matchesByDate.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Column(
+                    children: _matchesByDate.map((match) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: kPrimaryStrokeColor),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                match.fishName,
+                                style: const TextStyle(fontWeight: FontWeight.w600),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text('₱${match.price.toStringAsFixed(2)}'),
+                                Text('Supply: ${match.supplyKg.toStringAsFixed(1)} kg',
+                                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+                const SizedBox(height: 15),
                 Row(
                   children: [
                     Text(
