@@ -7,7 +7,6 @@ import 'package:fishcast/core/services/fish_forecast_service.dart';
 import 'package:fishcast/core/models/fish_forecast_model.dart';
 import 'package:fishcast/features/forecast/seasonal_analysis_page.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class ForecastPage extends StatefulWidget {
   const ForecastPage({super.key});
@@ -33,7 +32,6 @@ class _ForecastPageState extends State<ForecastPage> {
   String? _byDateError;
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
-  final DateFormat _dateFormat = DateFormat('yyyy-MM-dd');
 
   @override
   void initState() {
@@ -618,9 +616,6 @@ class _ForecastPageState extends State<ForecastPage> {
                   const SizedBox(height: 12),
                   Column(
                     children: _matchesByDate.map((match) {
-                      final dateLabel = match.date != null
-                          ? _dateFormat.format(match.date!)
-                          : 'Within next 7 days';
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(12),
@@ -643,8 +638,6 @@ class _ForecastPageState extends State<ForecastPage> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text('₱${match.price.toStringAsFixed(2)}'),
-                                
-                                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
                               ],
                             ),
                           ],
