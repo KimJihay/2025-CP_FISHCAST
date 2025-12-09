@@ -3,7 +3,6 @@ import 'package:fishcast/core/services/seasonal_analysis_service.dart';
 import 'package:fishcast/core/utils/constants.dart';
 import 'package:fishcast/core/widgets/bar/appbar.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
-import 'package:fishcast/core/widgets/graph/dual_linechart_widget.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:flutter/material.dart';
 
@@ -351,18 +350,22 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
       labels: monthLabels,
     );
 
-    // Compute combined y-axis range for dual chart
-    final allValues = [...priceValues, ...supplyValues];
     double computeMin(List<double> values) =>
         values.reduce((a, b) => a < b ? a : b);
     double computeMax(List<double> values) =>
         values.reduce((a, b) => a > b ? a : b);
 
-    final minY = computeMin(allValues);
-    final maxY = computeMax(allValues);
-    final range = (maxY - minY).abs();
-    final minChartY = (minY - range * 0.1).clamp(0, double.infinity);
-    final maxChartY = maxY + range * 0.1;
+    final minPrice = computeMin(priceValues);
+    final maxPrice = computeMax(priceValues);
+    final priceRange = (maxPrice - minPrice).abs();
+    final minPriceY = (minPrice - priceRange * 0.1).clamp(0, double.infinity);
+    final maxPriceY = maxPrice + priceRange * 0.1;
+
+    final minSupply = computeMin(supplyValues);
+    final maxSupply = computeMax(supplyValues);
+    final supplyRange = (maxSupply - minSupply).abs();
+    final minSupplyY = (minSupply - supplyRange * 0.1).clamp(0, double.infinity);
+    final maxSupplyY = maxSupply + supplyRange * 0.1;
 
     return RefreshIndicator(
       onRefresh: () => _loadFishSeasonalData(forceRefresh: true),
@@ -430,19 +433,36 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
             
             const SizedBox(height: 24),
             
-            // Combined Price & Supply Chart
+            // Price Chart
             _buildChartCard(
-              'Monthly Patterns',
-              DualLinechartWidget(
-                line1Data: priceData,
-                line2Data: supplyData,
+              'Monthly Average Prices',
+              LinechartWidget(
+                data: priceData,
                 axisConfig: AxisConfig(
                   customLabels: monthLabels,
                   minX: 0,
                   maxX: 11,
-                  minY: minChartY.toDouble(),
-                  maxY: maxChartY.toDouble(),
-                  interval: range > 0 ? range / 4 : 1,
+                  minY: minPriceY.toDouble(),
+                  maxY: maxPriceY.toDouble(),
+                  interval: priceRange > 0 ? priceRange / 4 : 1,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Supply Chart
+            _buildChartCard(
+              'Monthly Average Supply (kg)',
+              LinechartWidget(
+                data: supplyData,
+                axisConfig: AxisConfig(
+                  customLabels: monthLabels,
+                  minX: 0,
+                  maxX: 11,
+                  minY: minSupplyY.toDouble(),
+                  maxY: maxSupplyY.toDouble(),
+                  interval: supplyRange > 0 ? supplyRange / 4 : 1,
                 ),
               ),
             ),
