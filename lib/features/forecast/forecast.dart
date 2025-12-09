@@ -614,14 +614,6 @@ class _ForecastPageState extends State<ForecastPage> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 ],
-                if (_byDateError == null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Text(
-                      'Searches the next 7 days of forecasts',
-                      style: TextStyle(color: kSecondaryTextColor, fontSize: 12),
-                    ),
-                  ),
                 if (_matchesByDate.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Column(
