@@ -643,7 +643,7 @@ class _ForecastPageState extends State<ForecastPage> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text('₱${match.price.toStringAsFixed(2)}'),
-                                Text('Date: $dateLabel',
+                                
                                     style: const TextStyle(fontSize: 12, color: Colors.grey)),
                               ],
                             ),
