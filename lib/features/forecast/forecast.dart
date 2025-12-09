@@ -30,6 +30,7 @@ class _ForecastPageState extends State<ForecastPage> {
   List<Map<String, dynamic>> _topFishByPrice = [];
   List<PriceMatch> _matchesByDate = [];
   String? _byDateError;
+  String? _currentPriceNote;
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
 
@@ -39,6 +40,7 @@ class _ForecastPageState extends State<ForecastPage> {
     _loadFishTypes();
     _loadForecast();
     _loadTopFishByPrice();
+    _loadCurrentPriceNote();
   }
 
   /// Load top 5 fish sorted by price
@@ -118,6 +120,31 @@ class _ForecastPageState extends State<ForecastPage> {
           _isLoadingTopFish = false;
         });
       }
+    }
+  }
+
+  Future<void> _loadCurrentPriceNote() async {
+    try {
+      final data = await _forecastService.getCurrentPrices();
+      if (data == null || data['prices'] == null) return;
+      final Map<String, dynamic> prices = Map<String, dynamic>.from(data['prices'] as Map);
+      if (prices.isEmpty) return;
+      final values = prices.values
+          .map((e) => (e as Map)['price'])
+          .whereType<num>()
+          .map((n) => n.toDouble())
+          .toList();
+      if (values.isEmpty) return;
+      final minP = values.reduce((a, b) => a < b ? a : b);
+      final maxP = values.reduce((a, b) => a > b ? a : b);
+      final date = data['date'] ?? '';
+      if (mounted) {
+        setState(() {
+          _currentPriceNote = 'Latest prices (${date.toString()}): ₱${minP.toStringAsFixed(2)} - ₱${maxP.toStringAsFixed(2)}';
+        });
+      }
+    } catch (_) {
+      // ignore
     }
   }
 
@@ -610,6 +637,13 @@ class _ForecastPageState extends State<ForecastPage> {
                   Text(
                     _byDateError!,
                     style: const TextStyle(color: Colors.red),
+                  ),
+                ],
+                if (_byDateError == null && _currentPriceNote != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _currentPriceNote!,
+                    style: TextStyle(color: kSecondaryTextColor, fontSize: 12),
                   ),
                 ],
                 if (_matchesByDate.isNotEmpty) ...[
