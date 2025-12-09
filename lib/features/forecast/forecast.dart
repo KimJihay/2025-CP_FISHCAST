@@ -30,7 +30,7 @@ class _ForecastPageState extends State<ForecastPage> {
   List<Map<String, dynamic>> _topFishByPrice = [];
   List<PriceMatch> _matchesByDate = [];
   String? _byDateError;
-  String? _currentPriceNote;
+  String? _predictedPriceNote;
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
 
@@ -40,7 +40,7 @@ class _ForecastPageState extends State<ForecastPage> {
     _loadFishTypes();
     _loadForecast();
     _loadTopFishByPrice();
-    _loadCurrentPriceNote();
+    _loadPredictedTodayNote();
   }
 
   /// Load top 5 fish sorted by price
@@ -123,24 +123,42 @@ class _ForecastPageState extends State<ForecastPage> {
     }
   }
 
-  Future<void> _loadCurrentPriceNote() async {
+  Future<void> _loadPredictedTodayNote() async {
     try {
-      final data = await _forecastService.getCurrentPrices();
-      if (data == null || data['prices'] == null) return;
-      final Map<String, dynamic> prices = Map<String, dynamic>.from(data['prices'] as Map);
+      final forecasts = await _forecastService.getAllForecasts(forceRefresh: true);
+      if (forecasts == null || forecasts.isEmpty) return;
+
+      DateTime? earliest;
+      final prices = <double>[];
+
+      forecasts.forEach((_, forecast) {
+        if (forecast.forecast.isEmpty) return;
+        for (final point in forecast.forecast) {
+          if (earliest == null || point.date.isBefore(earliest!)) {
+            earliest = point.date;
+          }
+        }
+      });
+
+      if (earliest == null) return;
+
+      forecasts.forEach((_, forecast) {
+        for (final point in forecast.forecast) {
+          if (point.date.isAtSameMomentAs(earliest!)) {
+            prices.add(point.price);
+            break;
+          }
+        }
+      });
+
       if (prices.isEmpty) return;
-      final values = prices.values
-          .map((e) => (e as Map)['price'])
-          .whereType<num>()
-          .map((n) => n.toDouble())
-          .toList();
-      if (values.isEmpty) return;
-      final minP = values.reduce((a, b) => a < b ? a : b);
-      final maxP = values.reduce((a, b) => a > b ? a : b);
-      final date = data['date'] ?? '';
+
+      final minP = prices.reduce((a, b) => a < b ? a : b);
+      final maxP = prices.reduce((a, b) => a > b ? a : b);
       if (mounted) {
         setState(() {
-          _currentPriceNote = 'Latest prices (${date.toString()}): ₱${minP.toStringAsFixed(2)} - ₱${maxP.toStringAsFixed(2)}';
+          _predictedPriceNote =
+              'Predicted ${earliest!.toIso8601String().split('T')[0]}: ₱${minP.toStringAsFixed(2)} - ₱${maxP.toStringAsFixed(2)}';
         });
       }
     } catch (_) {
@@ -639,10 +657,10 @@ class _ForecastPageState extends State<ForecastPage> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 ],
-                if (_byDateError == null && _currentPriceNote != null) ...[
+                if (_byDateError == null && _predictedPriceNote != null) ...[
                   const SizedBox(height: 8),
                   Text(
-                    _currentPriceNote!,
+                    _predictedPriceNote!,
                     style: TextStyle(color: kSecondaryTextColor, fontSize: 12),
                   ),
                 ],
