@@ -128,27 +128,11 @@ class _ForecastPageState extends State<ForecastPage> {
       final forecasts = await _forecastService.getAllForecasts(forceRefresh: true);
       if (forecasts == null || forecasts.isEmpty) return;
 
-      DateTime? earliest;
       final prices = <double>[];
-
+      // Use the first forecast point (soonest) for each fish
       forecasts.forEach((_, forecast) {
         if (forecast.forecast.isEmpty) return;
-        for (final point in forecast.forecast) {
-          if (earliest == null || point.date.isBefore(earliest!)) {
-            earliest = point.date;
-          }
-        }
-      });
-
-      if (earliest == null) return;
-
-      forecasts.forEach((_, forecast) {
-        for (final point in forecast.forecast) {
-          if (point.date.isAtSameMomentAs(earliest!)) {
-            prices.add(point.price);
-            break;
-          }
-        }
+        prices.add(forecast.forecast.first.price);
       });
 
       if (prices.isEmpty) return;
@@ -158,7 +142,7 @@ class _ForecastPageState extends State<ForecastPage> {
       if (mounted) {
         setState(() {
           _predictedPriceNote =
-              'Predicted ${earliest!.toIso8601String().split('T')[0]}: ₱${minP.toStringAsFixed(2)} - ₱${maxP.toStringAsFixed(2)}';
+              'Predicted price range today: ₱${minP.toStringAsFixed(2)} - ₱${maxP.toStringAsFixed(2)}';
         });
       }
     } catch (_) {
