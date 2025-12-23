@@ -304,12 +304,16 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     // Calculate y-axis range
+    // Calculate y-axis range
     final minSupply = supplies.reduce((a, b) => a < b ? a : b);
     final maxSupply = supplies.reduce((a, b) => a > b ? a : b);
-    final range = maxSupply - minSupply;
-    final yMin =
-        (minSupply - range * 0.1).clamp(0, double.infinity).toDouble();
-    final yMax = (maxSupply + range * 0.1).toDouble();
+    final range = (maxSupply - minSupply).abs();
+    final adjustedRange = range > 0 
+        ? range 
+        : (maxSupply.abs() * 0.05).clamp(1.0, double.infinity);
+        
+    final yMin = (minSupply - adjustedRange * 0.1).clamp(0, double.infinity).toDouble();
+    final yMax = (maxSupply + adjustedRange * 0.1).toDouble();
 
     return LinechartWidget(
       data: supplyPoints,
@@ -398,10 +402,53 @@ class _DashboardPageState extends State<DashboardPage> {
                           final fishData = _highestPriceFish[index];
                           final price = fishData['price'] as double;
                           final fishName = fishData['fishName'] as String;
+                          final imagePath = FishImageUtils.getImagePath(fishName);
 
                           final widgets = <Widget>[
                             ListTile(
-                              leading: Text("${index + 1}"),
+                              leading: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 24,
+                                    child: Text(
+                                      "${index + 1}",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: kSecondaryTextColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.green.withValues(alpha: 0.3),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        imagePath,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.green.withValues(alpha: 0.1),
+                                            child: const Icon(
+                                              Icons.phishing,
+                                              size: 20,
+                                              color: Colors.green,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                               title: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -410,6 +457,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                     child: Text(
                                       fishName,
                                       overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(width: 8),
@@ -457,10 +507,53 @@ class _DashboardPageState extends State<DashboardPage> {
                           final fishData = _lowestPriceFish[index];
                           final price = fishData['price'] as double;
                           final fishName = fishData['fishName'] as String;
+                          final imagePath = FishImageUtils.getImagePath(fishName);
 
                           final widgets = <Widget>[
                             ListTile(
-                              leading: Text("${index + 1}"),
+                              leading: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 24,
+                                    child: Text(
+                                      "${index + 1}",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: kSecondaryTextColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.orange.withValues(alpha: 0.3),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        imagePath,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.orange.withValues(alpha: 0.1),
+                                            child: const Icon(
+                                              Icons.phishing,
+                                              size: 20,
+                                              color: Colors.orange,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                               title: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -469,6 +562,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                     child: Text(
                                       fishName,
                                       overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(width: 8),

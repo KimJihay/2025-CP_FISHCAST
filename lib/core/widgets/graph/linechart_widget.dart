@@ -85,18 +85,16 @@ class LinechartWidget extends StatelessWidget {
                 ),
               ),
               leftTitles: AxisTitles(
+                axisNameSize: 30, // Reserve space for the label
                 axisNameWidget: axisConfig.yAxisLabel != null
                     ? Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: RotatedBox(
-                          quarterTurns: 1, // Rotate 90 degrees counter-clockwise
-                          child: Text(
-                            axisConfig.yAxisLabel!,
-                            style: TextStyle(
-                              fontSize: fontSize,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        padding: const EdgeInsets.only(bottom: 0.0), // Remove bottom padding which might be weird when rotated
+                        child: Text(
+                          axisConfig.yAxisLabel!,
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       )

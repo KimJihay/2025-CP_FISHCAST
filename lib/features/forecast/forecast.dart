@@ -458,28 +458,12 @@ class _ForecastPageState extends State<ForecastPage> {
                 Row(
                   children: [
                     Text(
-                      "Price Forecast",
+                      "Price",
                       style: TextStyle(
                         color: kForegroundColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Urbanist',
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        "FORECAST",
-                        style: TextStyle(
-                          color: Colors.blue[700],
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
                       ),
                     ),
                   ],
@@ -590,22 +574,6 @@ class _ForecastPageState extends State<ForecastPage> {
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Urbanist',
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        "FORECAST",
-                        style: TextStyle(
-                          color: Colors.blue[700],
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
                       ),
                     ),
                   ],
@@ -723,22 +691,6 @@ class _ForecastPageState extends State<ForecastPage> {
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Urbanist',
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        "FORECAST",
-                        style: TextStyle(
-                          color: Colors.blue[700],
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
                       ),
                     ),
                   ],
