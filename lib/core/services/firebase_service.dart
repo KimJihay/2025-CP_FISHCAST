@@ -24,6 +24,7 @@ class FirebaseService {
     required String email,
     required String password,
     required String firstName,
+    String? middleName,
     required String lastName,
   }) async {
     try {
@@ -42,6 +43,7 @@ class FirebaseService {
           userId: user.uid,
           email: email,
           firstName: firstName,
+          middleName: middleName,
           lastName: lastName,
         );
 
@@ -152,6 +154,7 @@ class FirebaseService {
     required String userId,
     required String email,
     required String firstName,
+    String? middleName,
     required String lastName,
     String? profilePictureUrl,
   }) async {
@@ -159,7 +162,9 @@ class FirebaseService {
       Map<String, dynamic> userData = {
         'email': email,
         'first_name': firstName,
+        'middle_name': middleName ?? '',
         'last_name': lastName,
+        'isAdmin': false,
         'created_at': FieldValue.serverTimestamp(),
         'updated_at': FieldValue.serverTimestamp(),
       };
@@ -179,6 +184,7 @@ class FirebaseService {
   Future<void> updateUserData({
     required String userId,
     String? firstName,
+    String? middleName,
     String? lastName,
     String? profilePictureUrl,
   }) async {
@@ -189,6 +195,10 @@ class FirebaseService {
 
       if (firstName != null) {
         updateData['first_name'] = firstName;
+      }
+
+      if (middleName != null) {
+        updateData['middle_name'] = middleName;
       }
 
       if (lastName != null) {

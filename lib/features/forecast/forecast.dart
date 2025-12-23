@@ -6,6 +6,7 @@ import 'package:fishcast/core/services/fish_type_service.dart';
 import 'package:fishcast/core/services/fish_forecast_service.dart';
 import 'package:fishcast/core/models/fish_forecast_model.dart';
 import 'package:fishcast/features/forecast/seasonal_analysis_page.dart';
+import 'package:fishcast/features/forecast/forecasted_prices_page.dart';
 import 'package:flutter/material.dart';
 
 class ForecastPage extends StatefulWidget {
@@ -427,6 +428,7 @@ class _ForecastPageState extends State<ForecastPage> {
           icon: const Icon(Icons.insights),
           label: const Text('Seasonal Trends'),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
         body: LayoutBuilder(
           builder: (context, constraints) {
             final screenHeight = constraints.maxHeight;
@@ -467,15 +469,15 @@ class _ForecastPageState extends State<ForecastPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.orange[100],
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        "Predicted",
+                        "FORECAST",
                         style: TextStyle(
-                          color: Colors.orange[800],
+                          color: Colors.blue[700],
                           fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -539,6 +541,30 @@ class _ForecastPageState extends State<ForecastPage> {
                   ],
                 ),
                 const SizedBox(height: 14),
+                // View Full Forecast button
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForecastedPricesPage(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_forward, size: 18),
+                      label: const Text('View Full Forecast'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue[700],
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ),
                 // Chart or Loading/Error state
                 Container(
                   constraints: BoxConstraints(
@@ -565,15 +591,15 @@ class _ForecastPageState extends State<ForecastPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.orange[50],
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        "Forecast",
+                        "FORECAST",
                         style: TextStyle(
-                          color: Colors.orange[800],
+                          color: Colors.blue[700],
                           fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -698,15 +724,15 @@ class _ForecastPageState extends State<ForecastPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.orange[100],
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        "Forecast",
+                        "FORECAST",
                         style: TextStyle(
-                          color: Colors.orange[800],
+                          color: Colors.blue[700],
                           fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

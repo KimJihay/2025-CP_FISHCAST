@@ -17,6 +17,7 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscureConfirmPassword = true;
   final AuthService _authService = AuthService();
   final _firstNameController = TextEditingController();
+  final _middleNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,6 +28,7 @@ class _SignupPageState extends State<SignupPage> {
   @override
   void dispose() {
     _firstNameController.dispose();
+    _middleNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -78,6 +80,7 @@ class _SignupPageState extends State<SignupPage> {
         email: _emailController.text,
         password: _passwordController.text,
         firstName: _firstNameController.text,
+        middleName: _middleNameController.text,
         lastName: _lastNameController.text,
       );
       
@@ -205,6 +208,18 @@ class _SignupPageState extends State<SignupPage> {
               controller: _firstNameController,
               decoration: InputDecoration(
                 hintText: "First Name",
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            TextFormField(
+              controller: _middleNameController,
+              decoration: InputDecoration(
+                hintText: "Middle Name (Optional)",
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 12,

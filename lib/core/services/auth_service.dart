@@ -17,6 +17,7 @@ class AuthService with ChangeNotifier {
     required String email,
     required String password,
     required String firstName,
+    String? middleName,
     required String lastName,
   }) async {
     try {
@@ -24,6 +25,7 @@ class AuthService with ChangeNotifier {
         email: email,
         password: password,
         firstName: firstName,
+        middleName: middleName,
         lastName: lastName,
       );
       notifyListeners();
@@ -89,6 +91,7 @@ class AuthService with ChangeNotifier {
   // Update User Data
   Future<void> updateUserData({
     String? firstName,
+    String? middleName,
     String? lastName,
     String? profilePictureUrl,
   }) async {
@@ -97,6 +100,7 @@ class AuthService with ChangeNotifier {
         await _firebaseService.updateUserData(
           userId: currentUser!.uid,
           firstName: firstName,
+          middleName: middleName,
           lastName: lastName,
           profilePictureUrl: profilePictureUrl,
         );
