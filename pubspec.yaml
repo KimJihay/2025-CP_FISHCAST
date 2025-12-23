@@ -89,6 +89,7 @@ flutter:
     - assets/fonts/
     - assets/login_button/
     - assets/
+    - assets/fish_images/
 
 # App Icon Configuration
 flutter_launcher_icons:

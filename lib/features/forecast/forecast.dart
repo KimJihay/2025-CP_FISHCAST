@@ -1,4 +1,5 @@
 import 'package:fishcast/core/utils/constants.dart';
+import 'package:fishcast/core/utils/fish_image_utils.dart';
 import 'package:fishcast/core/widgets/bar/appbar.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
@@ -492,49 +493,53 @@ class _ForecastPageState extends State<ForecastPage> {
                       style: TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                     const SizedBox(width: 8),
-                    SizedBox(
-                      width: 83.5,
-                      height: 22,
+                    GestureDetector(
+                      onTap: _showFishSelectionDialog,
                       child: Container(
-                        padding: const EdgeInsets.only(left: 8, right: 4),
-                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           border: Border.all(
                             color: kPrimaryStrokeColor,
                             width: 1,
                           ),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        child: DropdownButton<String>(
-                          isDense: true,
-                          isExpanded: true,
-                          value: dropdownValue,
-                          icon: const Icon(
-                            Icons.arrow_drop_down,
-                            color: kSecondaryTextColor,
-                            size: 20,
-                          ),
-                          iconSize: 20,
-                          elevation: 2,
-                          style: const TextStyle(
-                            color: kSecondaryTextColor,
-                            fontSize: 12,
-                          ),
-                          dropdownColor: Colors.white,
-                          underline: const SizedBox(),
-                          onChanged: _onFishTypeChanged,
-                          items: fishTypes.map<DropdownMenuItem<String>>((
-                            String value,
-                          ) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 12),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Fish image thumbnail
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(3),
+                              child: Image.asset(
+                                FishImageUtils.getImagePath(dropdownValue),
+                                width: 20,
+                                height: 20,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 20,
+                                    height: 20,
+                                    color: kPrimaryColor.withValues(alpha: 0.1),
+                                    child: const Icon(Icons.phishing, size: 14, color: kPrimaryColor),
+                                  );
+                                },
                               ),
-                            );
-                          }).toList(),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _shortenFishName(dropdownValue),
+                              style: const TextStyle(
+                                color: kSecondaryTextColor,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_drop_down,
+                              color: kSecondaryTextColor,
+                              size: 18,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -843,5 +848,222 @@ class _ForecastPageState extends State<ForecastPage> {
         ),
       ),
     );
+  }
+
+  /// Show fish selection dialog with image grid
+  void _showFishSelectionDialog() {
+    if (fishTypes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Loading fish list...')),
+      );
+      return;
+    }
+
+    final sortedFishTypes = List<String>.from(fishTypes)..sort();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  // Drag handle
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.phishing,
+                            color: Colors.blue[700],
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Select Fish Type',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: kForegroundColor,
+                                ),
+                              ),
+                              Text(
+                                'Tap a fish to view its forecast',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: kSecondaryTextColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                          color: kSecondaryTextColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  // Fish Grid
+                  Expanded(
+                    child: GridView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.8,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: sortedFishTypes.length,
+                      itemBuilder: (context, index) {
+                        return _buildFishCard(sortedFishTypes[index]);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildFishCard(String fishName) {
+    final imagePath = FishImageUtils.getImagePath(fishName);
+    final isSelected = fishName == dropdownValue;
+    
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        if (fishName != dropdownValue) {
+          setState(() {
+            dropdownValue = fishName;
+          });
+          _loadForecast();
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.withValues(alpha: 0.1) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? Colors.blue : Colors.grey.shade200,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Fish Image
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.phishing,
+                          size: 40,
+                          color: Colors.blue[700],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            // Fish Name
+            Expanded(
+              flex: 1,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isSelected 
+                      ? Colors.blue.withValues(alpha: 0.1) 
+                      : Colors.blue.withValues(alpha: 0.05),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  _shortenFishName(fishName),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color: isSelected ? Colors.blue[700] : kForegroundColor,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Shorten fish name for display in grid cards
+  String _shortenFishName(String name) {
+    final parenIndex = name.indexOf('(');
+    if (parenIndex > 0) {
+      return name.substring(0, parenIndex).trim();
+    }
+    return name;
   }
 }

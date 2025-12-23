@@ -1,6 +1,7 @@
 import 'package:fishcast/core/models/seasonal_analysis_model.dart';
 import 'package:fishcast/core/services/seasonal_analysis_service.dart';
 import 'package:fishcast/core/utils/constants.dart';
+import 'package:fishcast/core/utils/fish_image_utils.dart';
 import 'package:fishcast/core/widgets/bar/appbar.dart';
 import 'package:fishcast/core/widgets/graph/linechart_widget.dart';
 import 'package:fishcast/core/widgets/graph/graph.dart';
@@ -797,51 +798,201 @@ class _SeasonalAnalysisPageState extends State<SeasonalAnalysisPage> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Select Fish Type',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: kPrimaryColor,
-                ),
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: fishList.length,
-                  itemBuilder: (context, index) {
-                    final fishName = fishList[index];
-                    return ListTile(
-                      leading: const Icon(Icons.water_drop, color: kPrimaryColor),
-                      title: Text(fishName),
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          _selectedFish = fishName;
-                          _showOverall = false;
-                        });
-                        _loadFishSeasonalData();
+              child: Column(
+                children: [
+                  // Drag handle
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: kPrimaryColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.phishing,
+                            color: kPrimaryColor,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Select Fish Type',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: kForegroundColor,
+                                ),
+                              ),
+                              Text(
+                                'Tap a fish to view its seasonal data',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: kSecondaryTextColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close),
+                          color: kSecondaryTextColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  // Fish Grid
+                  Expanded(
+                    child: GridView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.all(16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 0.8,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                      ),
+                      itemCount: fishList.length,
+                      itemBuilder: (context, index) {
+                        return _buildFishCard(fishList[index]);
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
+  }
+
+  Widget _buildFishCard(String fishName) {
+    final imagePath = FishImageUtils.getImagePath(fishName);
+    
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        setState(() {
+          _selectedFish = fishName;
+          _showOverall = false;
+        });
+        _loadFishSeasonalData();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Fish Image
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: kPrimaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.phishing,
+                          size: 40,
+                          color: kPrimaryColor,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            // Fish Name
+            Expanded(
+              flex: 1,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                decoration: BoxDecoration(
+                  color: kPrimaryColor.withValues(alpha: 0.05),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  _shortenFishName(fishName),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: kForegroundColor,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Shorten fish name for display in grid cards
+  String _shortenFishName(String name) {
+    // Remove parenthetical content for cleaner display
+    final parenIndex = name.indexOf('(');
+    if (parenIndex > 0) {
+      return name.substring(0, parenIndex).trim();
+    }
+    return name;
   }
 }

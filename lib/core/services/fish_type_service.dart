@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:fishcast/core/models/fish_type_model.dart';
+import 'package:fishcast/core/utils/constants.dart';
+import 'package:http/http.dart' as http;
 
 /// Service for managing fish types
 /// This service provides methods to fetch fish types from API or use default values
@@ -9,6 +12,9 @@ class FishTypeService {
   static final FishTypeService _instance = FishTypeService._internal();
   factory FishTypeService() => _instance;
   FishTypeService._internal();
+
+  // Backend API base URL
+  static const String _baseUrl = kBaseUrl;
 
   // Cache for fish types
   List<FishType>? _cachedFishTypes;
@@ -49,28 +55,69 @@ class FishTypeService {
     }
 
     try {
-      // TODO: Replace with actual API call
-      // Example:
-      // final response = await http.get(Uri.parse('YOUR_API_URL/fish-types'));
-      // if (response.statusCode == 200) {
-      //   final List<dynamic> data = json.decode(response.body);
-      //   _cachedFishTypes = data.map((json) => FishType.fromJson(json)).toList();
-      //   _lastFetchTime = DateTime.now();
-      //   return _cachedFishTypes!;
-      // }
-      
-      // For now, simulate API delay and return default types
-      await Future.delayed(const Duration(milliseconds: 500));
-      
+      final url = Uri.parse('$_baseUrl/');
+      developer.log('Fetching fish types from: $url', name: 'FishTypeService');
+
+      final response = await http.get(url).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw Exception('Request timeout - backend might be starting up');
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> availableFish = data['available_fish'] ?? [];
+
+        if (availableFish.isNotEmpty) {
+          // Convert API fish identifiers to FishType objects
+          _cachedFishTypes = availableFish.asMap().entries.map((entry) {
+            final apiId = entry.value.toString();
+            final displayName = _apiIdToDisplayName(apiId);
+            return FishType(
+              id: (entry.key + 1).toString(),
+              name: displayName,
+              scientificName: '', // API doesn't provide scientific names
+            );
+          }).toList();
+
+          _lastFetchTime = DateTime.now();
+          developer.log('Fetched ${_cachedFishTypes!.length} fish types from API', name: 'FishTypeService');
+          return _cachedFishTypes!;
+        }
+      }
+
+      // Fallback to defaults if API response is invalid
+      developer.log('API response invalid, using defaults', name: 'FishTypeService');
       _cachedFishTypes = _defaultFishTypes;
       _lastFetchTime = DateTime.now();
       return _cachedFishTypes!;
-      
+
     } catch (e) {
       // If API fails, return default fish types
       developer.log('Error fetching fish types: $e', name: 'FishTypeService');
       return _defaultFishTypes;
     }
+  }
+
+  /// Convert API identifier to display name
+  /// Example: "galunggong_round_scad" -> "Galunggong (Round Scad)"
+  String _apiIdToDisplayName(String apiId) {
+    final parts = apiId.split('_');
+    if (parts.length <= 1) {
+      return parts.first.isEmpty 
+          ? apiId 
+          : parts.first[0].toUpperCase() + parts.first.substring(1);
+    }
+
+    // First word is the local name, rest is the English name in parentheses
+    final localName = parts.first[0].toUpperCase() + parts.first.substring(1);
+    final englishParts = parts.skip(1).map((word) =>
+        word.isEmpty ? '' : word[0].toUpperCase() + word.substring(1)
+    ).toList();
+    final englishName = englishParts.join(' ');
+
+    return '$localName ($englishName)';
   }
 
   /// Get fish type names only (for dropdowns)

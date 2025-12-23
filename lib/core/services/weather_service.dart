@@ -78,14 +78,14 @@ class WeatherService {
       // Cache the forecast data
       final cacheKey = '${CacheService.weeklyForecastKey}_${latitude}_$longitude';
       await _cacheService.saveCache(cacheKey, {
-        'forecasts': forecasts.map((f) => {
+        'forecasts': forecasts.map((f) => ({
           'date': f.date.toIso8601String(),
           'temperatureMax': f.temperatureMax,
           'temperatureMin': f.temperatureMin,
           'weatherCode': f.weatherCode,
           'precipitation': f.precipitation,
           'windSpeed': f.windSpeed,
-        }).toList(),
+        })).toList(),
       });
 
       return forecasts;

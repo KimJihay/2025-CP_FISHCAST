@@ -32,5 +32,5 @@ const String kBaseUrl = String.fromEnvironment(
   'FISHCAST_BASE_URL',
   defaultValue: kUseLocalBackend
       ? 'http://10.0.2.2:5000'
-      : 'https://fishcast-api-production.up.railway.app',
+      : 'https://fishcast-backend-coq5.onrender.com',
 );
