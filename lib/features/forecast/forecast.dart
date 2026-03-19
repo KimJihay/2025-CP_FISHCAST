@@ -651,6 +651,15 @@ class _ForecastPageState extends State<ForecastPage> {
                   const SizedBox(height: 12),
                   Column(
                     children: _matchesByDate.map((match) {
+                      // Format the date if available
+                      String? dateText;
+                      if (match.date != null) {
+                        final d = match.date!;
+                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        dateText = '${months[d.month - 1]} ${d.day}, ${d.year}';
+                      }
+
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(12),
@@ -662,10 +671,23 @@ class _ForecastPageState extends State<ForecastPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              child: Text(
-                                match.fishName,
-                                style: const TextStyle(fontWeight: FontWeight.w600),
-                                overflow: TextOverflow.ellipsis,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    match.fishName,
+                                    style: const TextStyle(fontWeight: FontWeight.w600),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  if (dateText != null)
+                                    Text(
+                                      dateText,
+                                      style: TextStyle(
+                                        color: kSecondaryTextColor,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
                             const SizedBox(width: 8),
