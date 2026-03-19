@@ -31,6 +31,6 @@ const bool kUseLocalBackend = bool.fromEnvironment(
 const String kBaseUrl = String.fromEnvironment(
   'FISHCAST_BASE_URL',
   defaultValue: kUseLocalBackend
-      ? 'http://10.0.2.2:5000'
-      : 'https://fishcast-backend-coq5.onrender.com',
+      ? 'http://10.0.2.2:8000'
+      : 'https://unenveloped-perishably-valerie.ngrok-free.dev', //ok na to
 );

@@ -35,6 +35,7 @@ class _ForecastPageState extends State<ForecastPage> {
   String? _predictedPriceNote;
   final TextEditingController _minPriceController = TextEditingController();
   final TextEditingController _maxPriceController = TextEditingController();
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -234,6 +235,40 @@ class _ForecastPageState extends State<ForecastPage> {
     super.dispose();
   }
 
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    // Dataset starts from 2024-01-01, allow up to 7 days in the future (forecast)
+    final firstDate = DateTime(2024, 1, 1);
+    final lastDate = now.add(const Duration(days: 7));
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? now,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      helpText: 'Select a date',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: kSecondaryColor,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: kForegroundColor,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
   Future<void> _loadPricesByDate() async {
     double? minPrice;
     double? maxPrice;
@@ -265,17 +300,34 @@ class _ForecastPageState extends State<ForecastPage> {
       _byDateError = null;
     });
 
-    final matches = await _forecastService.getForecastMatchesByPriceRange(
-      minPrice: minPrice,
-      maxPrice: maxPrice,
-    );
+    List<PriceMatch>? matches;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (_selectedDate != null && !_selectedDate!.isAfter(today)) {
+      // Historical or today — use backend /prices/by-date
+      matches = await _forecastService.getPricesByDate(
+        date: _selectedDate!,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
+    } else {
+      // Future date or no date — use forecast data
+      matches = await _forecastService.getForecastMatchesByPriceRange(
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+        filterDate: _selectedDate,
+      );
+    }
 
     if (!mounted) return;
 
     setState(() {
       _isLoadingByDate = false;
       if (matches == null || matches.isEmpty) {
-        _byDateError = 'No results within that price range for the next 7 days';
+        _byDateError = _selectedDate != null
+            ? 'No results for that price range on the selected date'
+            : 'No results within that price range for the next 7 days';
         _matchesByDate = [];
       } else {
         _matchesByDate = matches;
@@ -579,6 +631,51 @@ class _ForecastPageState extends State<ForecastPage> {
                   ],
                 ),
                 const SizedBox(height: 12),
+                // Date filter chip
+                Row(
+                  children: [
+                    ActionChip(
+                      avatar: Icon(
+                        _selectedDate != null ? Icons.event : Icons.calendar_today,
+                        size: 18,
+                        color: _selectedDate != null ? Colors.white : kSecondaryColor,
+                      ),
+                      label: Text(
+                        _selectedDate != null
+                            ? '${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][_selectedDate!.month - 1]} ${_selectedDate!.day}, ${_selectedDate!.year}'
+                            : 'Any date',
+                        style: TextStyle(
+                          color: _selectedDate != null ? Colors.white : kForegroundColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                      backgroundColor: _selectedDate != null ? kSecondaryColor : Colors.grey[100],
+                      side: BorderSide(
+                        color: _selectedDate != null ? kSecondaryColor : kPrimaryStrokeColor,
+                      ),
+                      onPressed: _pickDate,
+                    ),
+                    if (_selectedDate != null) ...[
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedDate = null;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close, size: 14, color: Colors.black54),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 8),
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final isNarrow = constraints.maxWidth < 500;

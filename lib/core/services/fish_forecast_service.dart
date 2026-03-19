@@ -201,9 +201,12 @@ class FishForecastService {
   }
 
   /// Filter forecasts by price range over the next 7 days (forecast data only)
+  ///
+  /// [filterDate] - If provided, only returns matches for that specific date
   Future<List<PriceMatch>?> getForecastMatchesByPriceRange({
     double? minPrice,
     double? maxPrice,
+    DateTime? filterDate,
   }) async {
     try {
       final all = await getAllForecasts(forceRefresh: true);
@@ -213,6 +216,15 @@ class FishForecastService {
 
       all.forEach((apiId, forecast) {
         for (final point in forecast.forecast) {
+          // If a specific date filter is set, skip non-matching dates
+          if (filterDate != null) {
+            if (point.date.year != filterDate.year ||
+                point.date.month != filterDate.month ||
+                point.date.day != filterDate.day) {
+              continue;
+            }
+          }
+
           final price = point.price;
           if (minPrice != null && price < minPrice) continue;
           if (maxPrice != null && price > maxPrice) continue;
@@ -234,6 +246,63 @@ class FishForecastService {
       return matches;
     } catch (e) {
       _log('Error filtering forecast matches by price range: $e');
+      return null;
+    }
+  }
+
+  /// Fetch historical prices from the dataset for a specific date
+  ///
+  /// Calls the backend /prices/by-date endpoint to get actual recorded prices
+  Future<List<PriceMatch>?> getPricesByDate({
+    required DateTime date,
+    double? minPrice,
+    double? maxPrice,
+  }) async {
+    try {
+      final dateStr =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final queryParams = <String, String>{'date': dateStr};
+      if (minPrice != null) queryParams['min_price'] = minPrice.toString();
+      if (maxPrice != null) queryParams['max_price'] = maxPrice.toString();
+
+      final url = Uri.parse('$_baseUrl/prices/by-date').replace(queryParameters: queryParams);
+      _log('Fetching prices by date from: $url');
+
+      final response = await http.get(url).timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw Exception('Request timeout'),
+          );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final matchesRaw = data['matches'] as List<dynamic>? ?? [];
+
+        final matches = matchesRaw.map((m) {
+          final map = m as Map<String, dynamic>;
+          DateTime? parsedDate;
+          if (data['date'] != null) {
+            parsedDate = DateTime.tryParse(data['date'] as String);
+          }
+          return PriceMatch(
+            fishKey: map['fish_key'] as String,
+            fishName: map['fish_name'] as String,
+            price: (map['price'] as num).toDouble(),
+            supplyKg: (map['supply_kg'] as num?)?.toDouble() ?? 0,
+            date: parsedDate,
+          );
+        }).toList();
+
+        matches.sort((a, b) => a.price.compareTo(b.price));
+        return matches;
+      } else if (response.statusCode == 404) {
+        _log('No records for date: $dateStr');
+        return [];
+      } else {
+        _log('API error for prices by date: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      _log('Error fetching prices by date: $e');
       return null;
     }
   }
